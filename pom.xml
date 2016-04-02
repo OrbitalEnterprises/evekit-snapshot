@@ -7,15 +7,22 @@
   </parent>
   <groupId>enterprises.orbital.evekit</groupId>
   <artifactId>snapshot</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>EveKit Snapshot</name>
   <description>Generate snapshot copies of an account at a given time</description>
+  <url>https://github.com/OrbitalEnterprises/evekit-snapshot</url>
+  <scm>
+  	<url>https://github.com/OrbitalEnterprises/evekit-snapshot</url>
+  	<connection>scm:git:https://github.com/OrbitalEnterprises/evekit-snapshot.git</connection>
+  	<tag>rel_1_0_0</tag>
+  	<developerConnection>scm:git:git@github.com:OrbitalEnterprises/evekit-snapshot.git</developerConnection>
+  </scm>
 
   <dependencies>
   	<dependency>
   		<groupId>enterprises.orbital.evekit</groupId>
   		<artifactId>model</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0</version>
   	</dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
