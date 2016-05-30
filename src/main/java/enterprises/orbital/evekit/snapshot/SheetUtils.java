@@ -49,11 +49,10 @@ public class SheetUtils {
                                    }
                                  }),
                                  DATE_STYLE(new DataFormatter() {
-                                   final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-
                                    @Override
                                    public String format(
                                                         Object value) {
+                                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
                                      formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                                      Date convert = (Date) value;
                                      return NO_STYLE.format(formatter.format(convert));
@@ -79,7 +78,7 @@ public class SheetUtils {
     }
   }
 
-  // Singletone
+  // Singleton
   private SheetUtils() {}
 
   public static class DumpCell {
@@ -109,7 +108,8 @@ public class SheetUtils {
 
   public static void populateNextRow(
                                      CSVPrinter output,
-                                     DumpCell... cells) throws IOException {
+                                     DumpCell... cells)
+    throws IOException {
     for (DumpCell next : cells) {
       output.print(next.format.format(next.value));
     }
@@ -120,7 +120,8 @@ public class SheetUtils {
                                            String file,
                                            ZipOutputStream stream,
                                            boolean skipHeader,
-                                           String alternateTitle) throws IOException {
+                                           String alternateTitle)
+    throws IOException {
     stream.putNextEntry(new ZipEntry(file));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     if (!skipHeader) {
@@ -134,7 +135,8 @@ public class SheetUtils {
                                      SynchronizedEveAccount acct,
                                      CSVPrinter output,
                                      long metaID,
-                                     String tableName) throws IOException {
+                                     String tableName)
+    throws IOException {
     CachedData tagged = CachedData.get(metaID, tableName);
     if (tagged == null) return 0;
     Set<Entry<String, String>> allMD = tagged.getAllMetaData();
