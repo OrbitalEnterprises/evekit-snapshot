@@ -24,7 +24,8 @@ public class ContainerLogSheetWriter {
   public static void dumpToSheet(
                                  SynchronizedEveAccount acct,
                                  ZipOutputStream stream,
-                                 long at) throws IOException {
+                                 long at)
+    throws IOException {
     // Sections:
     // ContainerLogs.csv
     // ContainerLogsMeta.csv
@@ -51,8 +52,8 @@ public class ContainerLogSheetWriter {
                                    new DumpCell(next.getItemID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getItemTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getNewConfiguration(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getOldConfiguration(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getNewConfiguration(), SheetUtils.CellFormat.NO_STYLE), 
+                                   new DumpCell(next.getOldConfiguration(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getPasswordType(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 

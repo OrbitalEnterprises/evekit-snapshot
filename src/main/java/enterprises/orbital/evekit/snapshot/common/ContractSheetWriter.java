@@ -27,7 +27,8 @@ public class ContractSheetWriter {
                                              SynchronizedEveAccount acct,
                                              ZipOutputStream stream,
                                              List<Contract> contracts,
-                                             long at) throws IOException {
+                                             long at)
+    throws IOException {
     List<Long> itemIDs = new ArrayList<Long>();
     stream.putNextEntry(new ZipEntry("ContractItems.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
@@ -39,7 +40,7 @@ public class ContractSheetWriter {
       List<ContractItem> batch = ContractItem.getAllContractItems(acct, at, contractID, 1000, contid);
       while (batch.size() > 0) {
         allItems.addAll(batch);
-        contid = batch.get(batch.size() - 1).getCid();
+        contid = batch.get(batch.size() - 1).getRecordID();
         batch = ContractItem.getAllContractItems(acct, at, contractID, 1000, contid);
       }
       if (allItems.size() > 0) {
@@ -70,7 +71,8 @@ public class ContractSheetWriter {
                                             SynchronizedEveAccount acct,
                                             ZipOutputStream stream,
                                             List<Contract> contracts,
-                                            long at) throws IOException {
+                                            long at)
+    throws IOException {
     List<Long> itemIDs = new ArrayList<Long>();
     stream.putNextEntry(new ZipEntry("ContractBids.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
@@ -82,7 +84,7 @@ public class ContractSheetWriter {
       List<ContractBid> batch = ContractBid.getAllBidsByContractID(acct, at, contractID, 1000, contid);
       while (batch.size() > 0) {
         allBids.addAll(batch);
-        contid = batch.get(batch.size() - 1).getCid();
+        contid = batch.get(batch.size() - 1).getBidID();
         batch = ContractBid.getAllBidsByContractID(acct, at, contractID, 1000, contid);
       }
       if (allBids.size() > 0) {
@@ -111,7 +113,8 @@ public class ContractSheetWriter {
   public static void dumpToSheet(
                                  SynchronizedEveAccount acct,
                                  ZipOutputStream stream,
-                                 long at) throws IOException {
+                                 long at)
+    throws IOException {
     // Sections:
     // Contracts.csv
     // ContractsMeta.csv
