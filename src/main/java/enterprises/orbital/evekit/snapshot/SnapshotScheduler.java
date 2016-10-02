@@ -47,6 +47,7 @@ import enterprises.orbital.evekit.snapshot.common.ContractSheetWriter;
 import enterprises.orbital.evekit.snapshot.common.FacWarStatsSheetWriter;
 import enterprises.orbital.evekit.snapshot.common.IndustryJobSheetWriter;
 import enterprises.orbital.evekit.snapshot.common.KillSheetWriter;
+import enterprises.orbital.evekit.snapshot.common.LocationSheetWriter;
 import enterprises.orbital.evekit.snapshot.common.MarketOrderSheetWriter;
 import enterprises.orbital.evekit.snapshot.common.StandingSheetWriter;
 import enterprises.orbital.evekit.snapshot.common.WalletJournalSheetWriter;
@@ -90,7 +91,8 @@ public class SnapshotScheduler {
   }
 
   public static List<File> findSnapshotFiles(
-                                             SynchronizedEveAccount acct) throws IOException {
+                                             SynchronizedEveAccount acct)
+    throws IOException {
     // Retrieve all snapshots for this account
     List<File> eligible = new ArrayList<File>();
     final String prefix = makeSnapshotFileNamePrefix(acct);
@@ -129,7 +131,8 @@ public class SnapshotScheduler {
   }
 
   public static long lastSnapshotTime(
-                                      SynchronizedEveAccount acct) throws IOException, ParseException {
+                                      SynchronizedEveAccount acct)
+    throws IOException, ParseException {
     List<File> snapshots = findSnapshotFiles(acct);
     if (snapshots.size() > 0) {
       String prefix = makeSnapshotFileNamePrefix(acct);
@@ -144,7 +147,8 @@ public class SnapshotScheduler {
 
   public static void generateAccountSnapshot(
                                              SynchronizedEveAccount acct,
-                                             long at) throws IOException {
+                                             long at)
+    throws IOException {
     // Generate output zip with one entry per sheet.
     log.info("Generating snapshot for: " + acct);
     Date now = new Date(at);
@@ -171,7 +175,8 @@ public class SnapshotScheduler {
   public static void createAccountDump(
                                        SynchronizedEveAccount toDump,
                                        ZipOutputStream writer,
-                                       long at) throws IOException {
+                                       long at)
+    throws IOException {
 
     // Write out common components
     if (toDump.isCharacterType()) {
@@ -188,6 +193,7 @@ public class SnapshotScheduler {
     FacWarStatsSheetWriter.dumpToSheet(toDump, writer, at);
     IndustryJobSheetWriter.dumpToSheet(toDump, writer, at);
     KillSheetWriter.dumpToSheet(toDump, writer, at);
+    LocationSheetWriter.dumpToSheet(toDump, writer, at);
     MarketOrderSheetWriter.dumpToSheet(toDump, writer, at);
     StandingSheetWriter.dumpToSheet(toDump, writer, at);
     WalletJournalSheetWriter.dumpToSheet(toDump, writer, at);
