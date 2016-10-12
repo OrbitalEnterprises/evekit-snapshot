@@ -166,7 +166,7 @@ public class ContractSheetWriter {
                                  new DumpCell(next.getReward(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE),
                                  new DumpCell(next.getCollateral(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE),
                                  new DumpCell(next.getBuyout(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE),
-                                 new DumpCell(next.getVolume(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
+                                 new DumpCell(next.getVolume(), SheetUtils.CellFormat.DOUBLE_STYLE)); 
       // @formatter:on
     }
     output.flush();

@@ -26,13 +26,14 @@ public class CalendarSheetWriter {
                                                       SynchronizedEveAccount acct,
                                                       ZipOutputStream stream,
                                                       List<UpcomingCalendarEvent> events,
-                                                      long at) throws IOException {
+                                                      long at)
+    throws IOException {
     List<Long> itemIDs = new ArrayList<Long>();
     stream.putNextEntry(new ZipEntry("CalendarEventAttendees.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Event ID", "Character ID", "Character Name", "Response");
     for (UpcomingCalendarEvent event : events) {
-      int eventID = event.getEventID();
+      long eventID = event.getEventID();
       List<CalendarEventAttendee> allAttendees = CalendarEventAttendee.getByEventID(acct, at, eventID);
       if (allAttendees.size() > 0) {
         for (CalendarEventAttendee next : allAttendees) {
@@ -58,7 +59,8 @@ public class CalendarSheetWriter {
   public static void dumpToSheet(
                                  SynchronizedEveAccount acct,
                                  ZipOutputStream stream,
-                                 long at) throws IOException {
+                                 long at)
+    throws IOException {
     // Sections:
     // UpcomingCalendarEvents.csv
     // UpcomingCalendarEventsMeta.csv

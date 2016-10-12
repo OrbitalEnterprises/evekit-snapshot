@@ -1,2 +1,2 @@
 # evekit-snapshot
-(ALPHA) EveKit account snapshot generator
+EveKit account snapshot generator

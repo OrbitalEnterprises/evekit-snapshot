@@ -24,14 +24,16 @@ public class WalletTransactionSheetWriter {
   public static void dumpToSheet(
                                  SynchronizedEveAccount acct,
                                  ZipOutputStream stream,
-                                 long at) throws IOException {
+                                 long at)
+    throws IOException {
     // Sections:
     // WalletTransactions.csv
     // WalletTransactionsMeta.csv
     stream.putNextEntry(new ZipEntry("WalletTransactions.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Account Key", "Transaction ID", "Date (Raw)", "Date", "Quantity", "Type Name", "Type ID", "Price", "Client ID", "Client Name",
-                       "Station ID", "Station Name", "Transaction Type", "Transaction For", "Journal Transaction ID");
+                       "Station ID", "Station Name", "Transaction Type", "Transaction For", "Journal Transaction ID", "Client Type ID", "Character ID",
+                       "Character Name");
     List<Long> metaIDs = new ArrayList<Long>();
     long contid = -1;
     List<WalletTransaction> batch = WalletTransaction.getAllForward(acct, at, 1000, contid);
@@ -56,7 +58,10 @@ public class WalletTransactionSheetWriter {
                                    new DumpCell(next.getStationName(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getTransactionType(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getTransactionFor(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getJournalTransactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
+                                   new DumpCell(next.getJournalTransactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getClientTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getCharacterID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getCharacterName(), SheetUtils.CellFormat.NO_STYLE)); 
         // @formatter:on
         if (next.hasMetaData()) metaIDs.add(next.getCid());
       }
