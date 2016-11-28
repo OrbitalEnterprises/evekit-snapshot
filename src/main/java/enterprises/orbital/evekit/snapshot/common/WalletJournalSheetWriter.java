@@ -24,14 +24,15 @@ public class WalletJournalSheetWriter {
   public static void dumpToSheet(
                                  SynchronizedEveAccount acct,
                                  ZipOutputStream stream,
-                                 long at) throws IOException {
+                                 long at)
+    throws IOException {
     // Sections:
     // WalletJournal.csv
     // WalletJournalMeta.csv
     stream.putNextEntry(new ZipEntry("WalletJournal.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Account Key", "Ref ID", "Date (Raw)", "Date", "Ref Type ID", "Owner Name 1", "Owner ID 1", "Owner Name 2", "Owner ID 2",
-                       "Arg Name 1", "Arg ID 1", "Amount", "Balance", "Reason", "Tax Receiver ID", "Tax Amount");
+                       "Arg Name 1", "Arg ID 1", "Amount", "Balance", "Reason", "Tax Receiver ID", "Tax Amount", "Owner 1 Type ID", "Owner 2 Type ID");
     List<Long> metaIDs = new ArrayList<Long>();
     long contid = -1;
     List<WalletJournal> batch = WalletJournal.getAllForward(acct, at, 1000, contid);
@@ -57,7 +58,9 @@ public class WalletJournalSheetWriter {
                                    new DumpCell(next.getBalance(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE), 
                                    new DumpCell(next.getReason(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getTaxReceiverID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getTaxAmount(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE)); 
+                                   new DumpCell(next.getTaxAmount(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE),
+                                   new DumpCell(next.getOwner1TypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getOwner2TypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
         // @formatter:on
         if (next.hasMetaData()) metaIDs.add(next.getCid());
       }

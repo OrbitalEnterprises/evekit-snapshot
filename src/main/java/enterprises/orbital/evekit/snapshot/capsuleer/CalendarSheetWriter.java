@@ -69,7 +69,7 @@ public class CalendarSheetWriter {
     stream.putNextEntry(new ZipEntry("UpcomingCalendarEvents.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Event ID", "Event Title", "Event Text", "Event Date (Raw)", "Event Date", "Duration", "Owner ID", "Owner Name", "Response",
-                       "Important");
+                       "Important", "Owner Type ID");
     List<UpcomingCalendarEvent> events = UpcomingCalendarEvent.getAllUpcomingCalendarEvents(acct, at);
     List<Long> metaIDs = new ArrayList<Long>();
 
@@ -87,7 +87,8 @@ public class CalendarSheetWriter {
                                  new DumpCell(next.getOwnerID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(next.getOwnerName(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.getResponse(), SheetUtils.CellFormat.NO_STYLE),
-                                 new DumpCell(next.isImportant(), SheetUtils.CellFormat.NO_STYLE)); 
+                                 new DumpCell(next.isImportant(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.getOwnerTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
       // @formatter:on
       metaIDs.add(next.getCid());
     }
