@@ -26,18 +26,19 @@ public class CharacterSheetSheetWriter {
   public static void dumpToSheet(
                                  SynchronizedEveAccount acct,
                                  ZipOutputStream stream,
-                                 long at) throws IOException {
+                                 long at)
+    throws IOException {
     // Sections:
     // CharacterSheet.csv
     // CharacterSheetMeta.csv
     stream.putNextEntry(new ZipEntry("CharacterSheet.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Balance", "Character ID", "Character Name", "Corporation ID", "Corporation Name", "Race", "DoB (Raw)", "DoB", "Bloodline",
-                       "Ancestry", "Gender", "Alliance Name", "Alliance ID", "Faction Name", "Faction ID", "Clone Name", "Clone Skill Points", "Intelligence",
-                       "Memory", "Charisma", "Perception", "Willpower", "Home Station ID", "Clone Jump Date (Raw)", "Clone Jump Date", "Last Respec Date (Raw)",
-                       "Last Respec Date", "Last Timed Respec (Raw)", "Last Timed Respec", "Free Respecs", "Free Skill Points", "Clone Type ID",
-                       "Remote Station Date (Raw)", "Remote Station Date", "Jump Activation (Raw)", "Jump Activation", "Jump Fatigue (Raw)", "Jump Fatigue",
-                       "Jump Last Update (Raw)", "Jump Last Update");
+    output.printRecord("ID", "Balance", "Character ID", "Character Name", "Corporation ID", "Corporation Name", "Race", "DoB (Raw)", "DoB", "BloodlineID",
+                       "Bloodline", "AncestryID", "Ancestry", "Gender", "Alliance Name", "Alliance ID", "Faction Name", "Faction ID", "Clone Name",
+                       "Clone Skill Points", "Intelligence", "Memory", "Charisma", "Perception", "Willpower", "Home Station ID", "Clone Jump Date (Raw)",
+                       "Clone Jump Date", "Last Respec Date (Raw)", "Last Respec Date", "Last Timed Respec (Raw)", "Last Timed Respec", "Free Respecs",
+                       "Free Skill Points", "Clone Type ID", "Remote Station Date (Raw)", "Remote Station Date", "Jump Activation (Raw)", "Jump Activation",
+                       "Jump Fatigue (Raw)", "Jump Fatigue", "Jump Last Update (Raw)", "Jump Last Update");
     CharacterSheet csheet = CharacterSheet.get(acct, at);
     if (csheet != null) {
       CharacterSheetBalance bal = CharacterSheetBalance.get(acct, at);
@@ -55,7 +56,9 @@ public class CharacterSheetSheetWriter {
                                  new DumpCell(csheet.getRace(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(csheet.getDoB(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(new Date(csheet.getDoB()), SheetUtils.CellFormat.DATE_STYLE), 
+                                 new DumpCell(csheet.getBloodlineID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(csheet.getBloodline(), SheetUtils.CellFormat.NO_STYLE), 
+                                 new DumpCell(csheet.getAncestryID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(csheet.getAncestry(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(csheet.getGender(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(csheet.getAllianceName(), SheetUtils.CellFormat.NO_STYLE), 

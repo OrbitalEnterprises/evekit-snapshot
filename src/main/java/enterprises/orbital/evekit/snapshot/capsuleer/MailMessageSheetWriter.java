@@ -26,13 +26,14 @@ public class MailMessageSheetWriter {
   public static void dumpToSheet(
                                  SynchronizedEveAccount acct,
                                  ZipOutputStream stream,
-                                 long at) throws IOException {
+                                 long at)
+    throws IOException {
     // Sections:
     // MailMessages.csv
     // MailMessagesMeta.csv
     stream.putNextEntry(new ZipEntry("MailMessages.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Message ID", "Sender ID", "Sender Name", "ToCharacter IDs", "Sent Date (Raw)", "Sent Date", "Title", "CorpOrAlliance ID",
+    output.printRecord("ID", "Message ID", "Sender ID", "Sender Name", "ToCharacter IDs", "Sent Date (Raw)", "Sent Date", "Title", "ToCorpOrAlliance ID",
                        "ToList IDs", "Msg Read", "SenderTypeID", "Body Retrieved", "Body");
     List<Long> metaIDs = new ArrayList<Long>();
     long contid = -1;
@@ -51,7 +52,7 @@ public class MailMessageSheetWriter {
                                    new DumpCell(nextMsg.getSentDate(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(new Date(nextMsg.getSentDate()), SheetUtils.CellFormat.DATE_STYLE), 
                                    new DumpCell(nextMsg.getTitle(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(nextMsg.getCorpOrAllianceID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(nextMsg.getToCorpOrAllianceID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(Arrays.toString(nextMsg.getToListID().toArray(new Long[nextMsg.getToListID().size()])), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(nextMsg.isMsgRead(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(nextMsg.getSenderTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
