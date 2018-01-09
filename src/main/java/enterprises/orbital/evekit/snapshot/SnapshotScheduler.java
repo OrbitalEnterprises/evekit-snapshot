@@ -1,74 +1,21 @@
 package enterprises.orbital.evekit.snapshot;
 
+import enterprises.orbital.base.OrbitalProperties;
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.snapshot.capsuleer.*;
+import enterprises.orbital.evekit.snapshot.common.*;
+import enterprises.orbital.evekit.snapshot.corporation.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipOutputStream;
-
-import enterprises.orbital.base.OrbitalProperties;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.snapshot.capsuleer.CalendarSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.CapsuleerRoleSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.CharacterSheetSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.ChatChannelSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.ContactNotificationSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.ImplantSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.JumpCloneImplantSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.JumpCloneSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.MailMessageSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.MailingListSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.MedalSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.NotificationSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.PlanetaryColoniesSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.ResearchAgentSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.SkillInTrainingSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.SkillSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.SkillsInQueueSheetWriter;
-import enterprises.orbital.evekit.snapshot.capsuleer.TitleSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.AccountBalanceSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.AccountStatusSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.AssetSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.BlueprintSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.BookmarkSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.ContactLabelSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.ContactSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.ContractSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.FacWarStatsSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.IndustryJobSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.KillSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.LocationSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.MarketOrderSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.StandingSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.WalletJournalSheetWriter;
-import enterprises.orbital.evekit.snapshot.common.WalletTransactionSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.ContainerLogSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.CorporationDivisionSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.CorporationMedalSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.CorporationMemberMedalSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.CorporationRoleSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.CorporationSheetSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.CorporationTitleSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.CustomsOfficesSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.FacilitiesSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.MemberSecurityLogSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.MemberSecuritySheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.MemberTrackingSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.OutpostSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.SecurityRoleSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.SecurityTitleSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.ShareholderSheetWriter;
-import enterprises.orbital.evekit.snapshot.corporation.StarbaseSheetWriter;
 
 /**
  * Create a snapshot of the given account. A separate cron job queues these up every few hours and deletes older snapshots as necessary.
@@ -179,10 +126,6 @@ public class SnapshotScheduler {
     throws IOException {
 
     // Write out common components
-    if (toDump.isCharacterType()) {
-      // AccountStatus only maintained for capsuleer accounts.
-      AccountStatusSheetWriter.dumpToSheet(toDump, writer, at);
-    }
     AccountBalanceSheetWriter.dumpToSheet(toDump, writer, at);
     AssetSheetWriter.dumpToSheet(toDump, writer, at);
     BlueprintSheetWriter.dumpToSheet(toDump, writer, at);
