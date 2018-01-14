@@ -2,6 +2,7 @@ package enterprises.orbital.evekit.snapshot.common;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,8 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.common.WalletTransaction;
 import enterprises.orbital.evekit.snapshot.SheetUtils;
 import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+
+import javax.persistence.Column;
 
 public class WalletTransactionSheetWriter {
 
@@ -31,10 +34,10 @@ public class WalletTransactionSheetWriter {
     // WalletTransactionsMeta.csv
     stream.putNextEntry(new ZipEntry("WalletTransactions.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Account Key", "Transaction ID", "Date (Raw)", "Date", "Quantity", "Type Name", "Type ID", "Price", "Client ID", "Client Name",
-                       "Station ID", "Station Name", "Transaction Type", "Transaction For", "Journal Transaction ID", "Client Type ID", "Character ID",
-                       "Character Name");
-    List<Long> metaIDs = new ArrayList<Long>();
+    output.printRecord("ID", "Division", "Transaction ID", "Date (Raw)", "Date", "Quantity", "Type ID",
+                       "Price", "Client ID", "Location ID", "Is Buy", "Is Personal", "Journal Transaction ID");
+
+    List<Long> metaIDs = new ArrayList<>();
     long contid = -1;
     List<WalletTransaction> batch = WalletTransaction.getAllForward(acct, at, 1000, contid);
 
@@ -44,24 +47,18 @@ public class WalletTransactionSheetWriter {
         // @formatter:off
         SheetUtils.populateNextRow(output, 
                                    new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getAccountKey(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getDivision(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getTransactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getDate(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(new Date(next.getDate()), SheetUtils.CellFormat.DATE_STYLE), 
                                    new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getTypeName(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getPrice(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE), 
                                    new DumpCell(next.getClientID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getClientName(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getStationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getStationName(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getTransactionType(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getTransactionFor(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getJournalTransactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getClientTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getCharacterID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getCharacterName(), SheetUtils.CellFormat.NO_STYLE)); 
+                                   new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.isBuy(), SheetUtils.CellFormat.NO_STYLE),
+                                   new DumpCell(next.isPersonal(), SheetUtils.CellFormat.NO_STYLE),
+                                   new DumpCell(next.getJournalTransactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
         // @formatter:on
         if (next.hasMetaData()) metaIDs.add(next.getCid());
       }

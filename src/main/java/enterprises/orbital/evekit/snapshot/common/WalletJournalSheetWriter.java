@@ -1,5 +1,12 @@
 package enterprises.orbital.evekit.snapshot.common;
 
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.common.WalletJournal;
+import enterprises.orbital.evekit.snapshot.SheetUtils;
+import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -7,14 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.common.WalletJournal;
-import enterprises.orbital.evekit.snapshot.SheetUtils;
-import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
 
 public class WalletJournalSheetWriter {
 
@@ -31,9 +30,13 @@ public class WalletJournalSheetWriter {
     // WalletJournalMeta.csv
     stream.putNextEntry(new ZipEntry("WalletJournal.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Account Key", "Ref ID", "Date (Raw)", "Date", "Ref Type ID", "Owner Name 1", "Owner ID 1", "Owner Name 2", "Owner ID 2",
-                       "Arg Name 1", "Arg ID 1", "Amount", "Balance", "Reason", "Tax Receiver ID", "Tax Amount", "Owner 1 Type ID", "Owner 2 Type ID");
-    List<Long> metaIDs = new ArrayList<Long>();
+    output.printRecord("ID", "Division", "Ref ID", "Date (Raw)", "Date", "Ref Type", "First Party ID",
+                       "First Party Type", "Second Party ID", "Second Party Type", "Arg Name 1", "Arg ID 1", "Amount",
+                       "Balance", "Reason", "Tax Receiver ID", "Tax Amount", "Location ID", "Transaction ID",
+                       "NPC Name", "NPC ID", "Destroyed Ship Type ID", "Character ID", "Corporation ID", "Alliance ID",
+                       "Job ID", "Contract ID", "System ID", "PlanetID");
+
+    List<Long> metaIDs = new ArrayList<>();
     long contid = -1;
     List<WalletJournal> batch = WalletJournal.getAllForward(acct, at, 1000, contid);
 
@@ -43,15 +46,15 @@ public class WalletJournalSheetWriter {
         // @formatter:off
         SheetUtils.populateNextRow(output, 
                                    new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getAccountKey(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getDivision(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getRefID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getDate(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(new Date(next.getDate()), SheetUtils.CellFormat.DATE_STYLE), 
-                                   new DumpCell(next.getRefTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getOwnerName1(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getOwnerID1(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getOwnerName2(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getOwnerID2(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getRefType(), SheetUtils.CellFormat.NO_STYLE),
+                                   new DumpCell(next.getFirstPartyID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getFirstPartyType(), SheetUtils.CellFormat.NO_STYLE),
+                                   new DumpCell(next.getSecondPartyID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getSecondPartyType(), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(next.getArgName1(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getArgID1(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getAmount(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE), 
@@ -59,8 +62,18 @@ public class WalletJournalSheetWriter {
                                    new DumpCell(next.getReason(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getTaxReceiverID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getTaxAmount(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE),
-                                   new DumpCell(next.getOwner1TypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getOwner2TypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
+                                   new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getTransactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getNpcName(), SheetUtils.CellFormat.NO_STYLE),
+                                   new DumpCell(next.getNpcID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getDestroyedShipTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getCharacterID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getCorporationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getAllianceID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getJobID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getContractID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getSystemID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getPlanetID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
         // @formatter:on
         if (next.hasMetaData()) metaIDs.add(next.getCid());
       }
