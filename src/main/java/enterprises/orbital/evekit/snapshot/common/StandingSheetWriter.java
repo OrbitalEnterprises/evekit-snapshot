@@ -29,7 +29,7 @@ public class StandingSheetWriter {
     // StandingsMeta.csv
     stream.putNextEntry(new ZipEntry("Standings.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Standing Entity", "From ID", "From Name", "Standing");
+    output.printRecord("ID", "Standing Entity", "From ID", "Standing");
     List<Long> metaIDs = new ArrayList<Long>();
     long contid = -1;
     List<Standing> batch = Standing.getAllStandings(acct, at, 1000, contid);
@@ -42,8 +42,7 @@ public class StandingSheetWriter {
                                    new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getStandingEntity(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getFromID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getFromName(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getStanding(), SheetUtils.CellFormat.DOUBLE_STYLE)); 
+                                   new DumpCell(next.getStanding(), SheetUtils.CellFormat.DOUBLE_STYLE));
         // @formatter:on
         metaIDs.add(next.getCid());
       }

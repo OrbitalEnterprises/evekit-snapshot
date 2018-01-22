@@ -29,7 +29,7 @@ public class AssetSheetWriter {
     // AssetsMeta.csv
     stream.putNextEntry(new ZipEntry("Assets.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Item ID", "Location ID", "Type ID", "Quantity", "Flag", "Singleton", "Raw Quantity", "Container");
+    output.printRecord("ID", "Item ID", "Location ID", "Location Type", "Location Flag", "Type ID", "Quantity", "Singleton", "Blueprint Type");
     List<Asset> assets = new ArrayList<Asset>();
     long contid = -1;
     List<Asset> batch = Asset.getAllAssets(acct, at, 1000, contid);
@@ -45,12 +45,12 @@ public class AssetSheetWriter {
                                  new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(next.getItemID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                 new DumpCell(next.getLocationType(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.getLocationFlag(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getFlag(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.isSingleton(), SheetUtils.CellFormat.NO_STYLE), 
-                                 new DumpCell(next.getRawQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                 new DumpCell(next.getContainer(), SheetUtils.CellFormat.NO_STYLE)); 
+                                 new DumpCell(next.isSingleton(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.getBlueprintType(), SheetUtils.CellFormat.NO_STYLE));
       // @formatter:on
     }
     output.flush();

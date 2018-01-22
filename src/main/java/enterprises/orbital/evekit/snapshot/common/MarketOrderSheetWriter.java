@@ -30,8 +30,8 @@ public class MarketOrderSheetWriter {
     // MarketOrdersMeta.csv
     stream.putNextEntry(new ZipEntry("MarketOrders.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Order ID", "Account Key", "Bid", "Character ID", "Duration", "Escrow", "Issued (Raw)", "Issued", "Min Volume", "Order State",
-                       "Price", "Order Range", "Station ID", "Type ID", "Volume Entered", "Volume Remaining");
+    output.printRecord("ID", "Order ID", "Wallet Division", "Bid", "Character ID", "Duration", "Escrow", "Issued (Raw)", "Issued", "Min Volume", "Order State",
+                       "Price", "Order Range", "Type ID", "Volume Entered", "Volume Remaining", "Region ID", "Location ID", "Is Corp");
     List<Long> metaIDs = new ArrayList<Long>();
     long contid = -1;
     List<MarketOrder> batch = MarketOrder.getAllForward(acct, at, 1000, contid);
@@ -43,7 +43,7 @@ public class MarketOrderSheetWriter {
         SheetUtils.populateNextRow(output, 
                                    new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getOrderID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getAccountKey(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getWalletDivision(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.isBid(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getCharID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(next.getDuration(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
@@ -51,13 +51,15 @@ public class MarketOrderSheetWriter {
                                    new DumpCell(next.getIssued(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(new Date(next.getIssued()), SheetUtils.CellFormat.DATE_STYLE), 
                                    new DumpCell(next.getMinVolume(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getOrderState(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getOrderState(), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(next.getPrice(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE), 
-                                   new DumpCell(next.getOrderRange(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getStationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getOrderRange(), SheetUtils.CellFormat.NO_STYLE),
+                                   new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getVolEntered(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getVolRemaining(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
+                                   new DumpCell(next.getVolRemaining(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getRegionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.isCorp(), SheetUtils.CellFormat.NO_STYLE));
         // @formatter:on
         metaIDs.add(next.getCid());
       }

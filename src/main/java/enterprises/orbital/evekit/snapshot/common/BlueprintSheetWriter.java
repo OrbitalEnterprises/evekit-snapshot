@@ -29,7 +29,7 @@ public class BlueprintSheetWriter {
     // BlueprintsMeta.csv
     stream.putNextEntry(new ZipEntry("Blueprints.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Item ID", "Location ID", "Type ID", "Type Name", "Flag ID", "Quantity", "Time Efficiency", "Material Efficiency", "Runs");
+    output.printRecord("ID", "Item ID", "Location ID", "Location Flag", "Type ID", "Quantity", "Time Efficiency", "Material Efficiency", "Runs");
     List<Blueprint> blueprints = new ArrayList<Blueprint>();
     long contid = -1;
     List<Blueprint> batch = Blueprint.getAllBlueprints(acct, at, 1000, contid);
@@ -45,10 +45,9 @@ public class BlueprintSheetWriter {
                                  new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(next.getItemID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getTypeName(), SheetUtils.CellFormat.NO_STYLE), 
-                                 new DumpCell(next.getFlagID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getQuantity(), SheetUtils.CellFormat.NO_STYLE), 
+                                 new DumpCell(next.getLocationFlag(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                 new DumpCell(next.getQuantity(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.getTimeEfficiency(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(next.getMaterialEfficiency(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(next.getRuns(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
