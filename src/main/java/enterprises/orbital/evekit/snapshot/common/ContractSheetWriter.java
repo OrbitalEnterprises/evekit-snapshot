@@ -1,49 +1,44 @@
 package enterprises.orbital.evekit.snapshot.common;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
 import enterprises.orbital.evekit.model.common.Contract;
 import enterprises.orbital.evekit.model.common.ContractBid;
 import enterprises.orbital.evekit.model.common.ContractItem;
 import enterprises.orbital.evekit.snapshot.SheetUtils;
 import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ContractSheetWriter {
 
   // Singleton
   private ContractSheetWriter() {}
 
-  public static List<Long> dumpContractItems(
-                                             SynchronizedEveAccount acct,
-                                             ZipOutputStream stream,
-                                             List<Contract> contracts,
-                                             long at)
-    throws IOException {
-    List<Long> itemIDs = new ArrayList<Long>();
+  private static List<Long> dumpContractItems(SynchronizedEveAccount acct, ZipOutputStream stream,
+                                              List<Contract> contracts, long at) throws IOException {
+    List<Long> itemIDs = new ArrayList<>();
     stream.putNextEntry(new ZipEntry("ContractItems.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Contract ID", "Record ID", "Type ID", "Quantity", "Raw Quantity", "Singleton", "Included");
+    output.printRecord("ID", "Contract ID", "Record ID", "Type ID", "Quantity", "Raw Quantity", "Singleton",
+                       "Included");
     for (Contract nextContract : contracts) {
-      long contractID = nextContract.getContractID();
-      List<ContractItem> allItems = new ArrayList<ContractItem>();
-      long contid = -1;
-      List<ContractItem> batch = ContractItem.getAllContractItems(acct, at, contractID, 1000, contid);
-      while (batch.size() > 0) {
-        allItems.addAll(batch);
-        contid = batch.get(batch.size() - 1).getRecordID();
-        batch = ContractItem.getAllContractItems(acct, at, contractID, 1000, contid);
-      }
-      if (allItems.size() > 0) {
+      int contractID = nextContract.getContractID();
+      List<ContractItem> allItems = CachedData.retrieveAll(at, (long contid, AttributeSelector ats) ->
+          ContractItem.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.values(contractID),
+                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()));
+      if (!allItems.isEmpty()) {
         for (ContractItem next : allItems) {
           // @formatter:off
           SheetUtils.populateNextRow(output,
@@ -56,8 +51,10 @@ public class ContractSheetWriter {
                                      new DumpCell(next.isSingleton(), SheetUtils.CellFormat.NO_STYLE),
                                      new DumpCell(next.isIncluded(), SheetUtils.CellFormat.NO_STYLE));
           // @formatter:on
-          itemIDs.add(next.getCid());
         }
+        itemIDs.addAll(allItems.stream()
+                               .map(CachedData::getCid)
+                               .collect(Collectors.toList()));
         output.println();
       }
     }
@@ -67,27 +64,19 @@ public class ContractSheetWriter {
     return itemIDs;
   }
 
-  public static List<Long> dumpContractBids(
-                                            SynchronizedEveAccount acct,
-                                            ZipOutputStream stream,
-                                            List<Contract> contracts,
-                                            long at)
-    throws IOException {
-    List<Long> itemIDs = new ArrayList<Long>();
+  private static List<Long> dumpContractBids(SynchronizedEveAccount acct, ZipOutputStream stream,
+                                             List<Contract> contracts, long at) throws IOException {
+    List<Long> itemIDs = new ArrayList<>();
     stream.putNextEntry(new ZipEntry("ContractBids.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Bid ID", "Contract ID", "Bidder ID", "Date Bid (Raw)", "Date Bid", "Amount");
     for (Contract nextContract : contracts) {
-      long contractID = nextContract.getContractID();
-      List<ContractBid> allBids = new ArrayList<ContractBid>();
-      long contid = -1;
-      List<ContractBid> batch = ContractBid.getAllBidsByContractID(acct, at, contractID, 1000, contid);
-      while (batch.size() > 0) {
-        allBids.addAll(batch);
-        contid = batch.get(batch.size() - 1).getBidID();
-        batch = ContractBid.getAllBidsByContractID(acct, at, contractID, 1000, contid);
-      }
-      if (allBids.size() > 0) {
+      int contractID = nextContract.getContractID();
+      List<ContractBid> allBids = CachedData.retrieveAll(at, (long contid, AttributeSelector ats) ->
+          ContractBid.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
+                                  AttributeSelector.values(contractID), AttributeSelector.any(),
+                                  AttributeSelector.any(), AttributeSelector.any()));
+      if (!allBids.isEmpty()) {
         for (ContractBid next : allBids) {
           // @formatter:off
           SheetUtils.populateNextRow(output,
@@ -99,8 +88,10 @@ public class ContractSheetWriter {
                                      new DumpCell(new Date(next.getDateBid()), SheetUtils.CellFormat.DATE_STYLE),
                                      new DumpCell(next.getAmount(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE));
           // @formatter:on
-          itemIDs.add(next.getCid());
         }
+        itemIDs.addAll(allBids.stream()
+                              .map(CachedData::getCid)
+                              .collect(Collectors.toList()));
         output.println();
       }
     }
@@ -110,11 +101,7 @@ public class ContractSheetWriter {
     return itemIDs;
   }
 
-  public static void dumpToSheet(
-                                 SynchronizedEveAccount acct,
-                                 ZipOutputStream stream,
-                                 long at)
-    throws IOException {
+  public static void dumpToSheet(SynchronizedEveAccount acct, ZipOutputStream stream, long at) throws IOException {
     // Sections:
     // Contracts.csv
     // ContractsMeta.csv
@@ -124,17 +111,21 @@ public class ContractSheetWriter {
     // ContractBidsMeta.csv
     stream.putNextEntry(new ZipEntry("Contracts.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Contract ID", "Issuer ID", "Issuer Corp ID", "Assignee ID", "Acceptor ID", "Start Station ID", "End Station ID", "Type", "Status",
-                       "Title", "For Corp", "Availability", "Date Issued (Raw)", "Date Issued", "Date Expired (Raw)", "Date Expired", "Date Accepted (Raw)",
-                       "Date Accepted", "Num Days", "Date Completed (Raw)", "Date Completed", "Price", "Reward", "Collateral", "Buyout", "Volume");
-    List<Contract> contracts = new ArrayList<Contract>();
-    long contid = 0;
-    List<Contract> batch = Contract.getAllContracts(acct, at, 1000, contid);
-    while (batch.size() > 0) {
-      contracts.addAll(batch);
-      contid = batch.get(batch.size() - 1).getContractID();
-      batch = Contract.getAllContracts(acct, at, 1000, contid);
-    }
+    output.printRecord("ID", "Contract ID", "Issuer ID", "Issuer Corp ID", "Assignee ID", "Acceptor ID",
+                       "Start Station ID", "End Station ID", "Type", "Status",
+                       "Title", "For Corp", "Availability", "Date Issued (Raw)", "Date Issued", "Date Expired (Raw)",
+                       "Date Expired", "Date Accepted (Raw)",
+                       "Date Accepted", "Num Days", "Date Completed (Raw)", "Date Completed", "Price", "Reward",
+                       "Collateral", "Buyout", "Volume");
+    List<Contract> contracts = CachedData.retrieveAll(at, (long contid, AttributeSelector ats) ->
+        Contract.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
+                             AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                             AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                             AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                             AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                             AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                             AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                             AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()));
 
     // Write out contract data first
     for (Contract next : contracts) {
