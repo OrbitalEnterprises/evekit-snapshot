@@ -1,5 +1,14 @@
 package enterprises.orbital.evekit.snapshot.corporation;
 
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import enterprises.orbital.evekit.model.corporation.ContainerLog;
+import enterprises.orbital.evekit.snapshot.SheetUtils;
+import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -7,14 +16,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.corporation.ContainerLog;
-import enterprises.orbital.evekit.snapshot.SheetUtils;
-import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
 
 public class ContainerLogSheetWriter {
 
@@ -29,50 +30,55 @@ public class ContainerLogSheetWriter {
     // ContainerLogs.csv
     // ContainerLogsMeta.csv
     stream.putNextEntry(new ZipEntry("ContainerLogs.csv"));
-    CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Log Time (Raw)", "Log Time", "Action", "Actor ID", "Actor Name", "Flag", "Item ID", "Item Type ID", "Location ID",
+    final CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
+    output.printRecord("ID", "Log Time (Raw)", "Log Time", "Action", "Character ID", "Location Flag",
+                       "Container ID", "Container Type ID", "Location ID",
                        "New Configuration", "Old Configuration", "Password Type", "Quantity", "Type ID");
-    List<Long> metaIDs = new ArrayList<Long>();
-    long contid = -1;
-    List<ContainerLog> batch = ContainerLog.getAllForward(acct, at, 1000, contid);
+    List<Long> metaIDs = new ArrayList<>();
 
-    while (batch.size() > 0) {
+    CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
+    CachedData.stream(at, (long contid, AttributeSelector ats) ->
+                          ContainerLog.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
+                                                  AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                  AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                  AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                  AttributeSelector.any(), AttributeSelector.any()),
+                      true, capture)
+              .forEach(next -> {
+                try {
+                  //@formatter:off
+                  SheetUtils.populateNextRow(output,
+                                             new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE),
+                                             new DumpCell(next.getLogTime(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(new Date(next.getLogTime()), SheetUtils.CellFormat.DATE_STYLE),
+                                             new DumpCell(next.getAction(), SheetUtils.CellFormat.NO_STYLE),
+                                             new DumpCell(next.getCharacterID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(next.getLocationFlag(), SheetUtils.CellFormat.NO_STYLE),
+                                             new DumpCell(next.getContainerID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(next.getContainerTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(next.getNewConfiguration(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(next.getOldConfiguration(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(next.getPasswordType(), SheetUtils.CellFormat.NO_STYLE),
+                                             new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                             new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
+                  //@formatter:on
+                } catch (IOException e) {
+                  capture.handle(e);
+                }
+                metaIDs.add(next.getCid());
+              });
 
-      for (ContainerLog next : batch) {
-        // @formatter:off
-        SheetUtils.populateNextRow(output, 
-                                   new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getLogTime(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(new Date(next.getLogTime()), SheetUtils.CellFormat.DATE_STYLE), 
-                                   new DumpCell(next.getAction(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getActorID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getActorName(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getFlag(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getItemID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getItemTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getNewConfiguration(), SheetUtils.CellFormat.NO_STYLE),
-                                   new DumpCell(next.getOldConfiguration(), SheetUtils.CellFormat.NO_STYLE),
-                                   new DumpCell(next.getPasswordType(), SheetUtils.CellFormat.NO_STYLE), 
-                                   new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
-        // @formatter:on
-        metaIDs.add(next.getCid());
-      }
-
-      contid = batch.get(batch.size() - 1).getLogTime();
-      batch = ContainerLog.getAllForward(acct, at, 1000, contid);
-    }
     output.flush();
     stream.closeEntry();
 
     // Handle MetaData
-    output = SheetUtils.prepForMetaData("ContainerLogsMeta.csv", stream, false, null);
+    CSVPrinter metaOutput = SheetUtils.prepForMetaData("ContainerLogsMeta.csv", stream, false, null);
     for (Long next : metaIDs) {
-      int count = SheetUtils.dumpNextMetaData(acct, output, next, "ContainerLog");
-      if (count > 0) output.println();
+      int count = SheetUtils.dumpNextMetaData(acct, metaOutput, next, "ContainerLog");
+      if (count > 0) metaOutput.println();
     }
-    output.flush();
+    metaOutput.flush();
     stream.closeEntry();
   }
 
