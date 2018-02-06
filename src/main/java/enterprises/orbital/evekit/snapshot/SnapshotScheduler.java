@@ -8,7 +8,6 @@ import enterprises.orbital.evekit.snapshot.corporation.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,39 +21,30 @@ import java.util.zip.ZipOutputStream;
  */
 public class SnapshotScheduler {
   protected static final Logger log               = Logger.getLogger(SnapshotScheduler.class.getName());
-  public static final String    PROP_SNAPSHOT_DIR = "enterprises.orbital.evekit.snapshot.directory";
-  public static final String    DEF_SNAPSHOT_DIR  = ".";
+  private static final String    PROP_SNAPSHOT_DIR = "enterprises.orbital.evekit.snapshot.directory";
+  private static final String    DEF_SNAPSHOT_DIR  = ".";
 
-  public static String makeSnapshotFileNamePrefix(
-                                                  SynchronizedEveAccount acct) {
+  private static String makeSnapshotFileNamePrefix(
+      SynchronizedEveAccount acct) {
     return "snapshot_" + acct.getUserAccount().getUid() + "_" + acct.getAid() + "_";
   }
 
-  public static String makeSnapshotFileName(
-                                            SynchronizedEveAccount acct,
-                                            Date when) {
+  private static String makeSnapshotFileName(
+      SynchronizedEveAccount acct,
+      Date when) {
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
     return makeSnapshotFileNamePrefix(acct) + formatter.format(when) + ".zip";
   }
 
-  public static List<File> findSnapshotFiles(
-                                             SynchronizedEveAccount acct)
+  private static List<File> findSnapshotFiles(
+      SynchronizedEveAccount acct)
     throws IOException {
     // Retrieve all snapshots for this account
-    List<File> eligible = new ArrayList<File>();
+    List<File> eligible = new ArrayList<>();
     final String prefix = makeSnapshotFileNamePrefix(acct);
     String snapshotDir = OrbitalProperties.getGlobalProperty(PROP_SNAPSHOT_DIR, DEF_SNAPSHOT_DIR);
     File dir = new File(snapshotDir);
-    eligible.addAll(Arrays.asList(dir.listFiles(new FilenameFilter() {
-
-      @Override
-      public boolean accept(
-                            File dir,
-                            String name) {
-        return name.startsWith(prefix);
-      }
-
-    })));
+    eligible.addAll(Arrays.asList(dir.listFiles((dir1, name) -> name.startsWith(prefix))));
     // Sort ascending by date.
     Collections.sort(eligible, new Comparator<File>() {
       final String           formatString = "yyyy_MM_dd_HH_mm_ss";
@@ -119,10 +109,10 @@ public class SnapshotScheduler {
     log.info("Cleaned up " + oldFiles.size() + " files");
   }
 
-  public static void createAccountDump(
-                                       SynchronizedEveAccount toDump,
-                                       ZipOutputStream writer,
-                                       long at)
+  private static void createAccountDump(
+      SynchronizedEveAccount toDump,
+      ZipOutputStream writer,
+      long at)
     throws IOException {
 
     // Write out common components
@@ -162,6 +152,9 @@ public class SnapshotScheduler {
       SkillSheetWriter.dumpToSheet(toDump, writer, at);
       SkillsInQueueSheetWriter.dumpToSheet(toDump, writer, at);
       TitleSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterLocationSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterShipSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterOnlineSheetWriter.dumpToSheet(toDump, writer, at);
     } else {
       // Corporations:
       ContainerLogSheetWriter.dumpToSheet(toDump, writer, at);
