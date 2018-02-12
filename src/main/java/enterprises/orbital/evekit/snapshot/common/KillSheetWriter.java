@@ -69,8 +69,6 @@ public class KillSheetWriter {
       output.flush();
     }
 
-    stream.closeEntry();
-
     return metaIDs;
   }
 
@@ -115,8 +113,6 @@ public class KillSheetWriter {
       output.flush();
     }
 
-    stream.closeEntry();
-
     return metaIDs;
   }
 
@@ -159,8 +155,6 @@ public class KillSheetWriter {
 
       output.flush();
     }
-
-    stream.closeEntry();
 
     return metaIDs;
   }
@@ -210,8 +204,6 @@ public class KillSheetWriter {
       output.flush();
     }
 
-    stream.closeEntry();
-
     if (!metaIDs.isEmpty()) {
       // Wrote at least one kill so proceed
 
@@ -237,7 +229,6 @@ public class KillSheetWriter {
           }
           output.flush();
         }
-        stream.closeEntry();
       }
 
       // Write out kill items data in the same style as meta data.
@@ -252,7 +243,6 @@ public class KillSheetWriter {
           }
           output.flush();
         }
-        stream.closeEntry();
       }
 
       // Write out kill victim data in the same style as meta data.
@@ -267,7 +257,6 @@ public class KillSheetWriter {
           }
           output.flush();
         }
-        stream.closeEntry();
       }
     }
   }
