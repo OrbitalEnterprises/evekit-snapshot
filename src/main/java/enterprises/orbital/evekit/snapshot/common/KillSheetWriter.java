@@ -32,21 +32,21 @@ public class KillSheetWriter {
     stream.putNextEntry(new ZipEntry("KillAttackers.csv"));
     List<Long> metaIDs = new ArrayList<>();
 
-    try (CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream))) {
-      output.printRecord("ID", "Kill ID", "Attacker Character ID", "Alliance ID", "Attacker Corporation ID",
-                         "Damage Done", "Faction ID", "Security Status", "Ship Type ID", "Weapon Type ID",
-                         "Final Blow");
+    CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
+    output.printRecord("ID", "Kill ID", "Attacker Character ID", "Alliance ID", "Attacker Corporation ID",
+                       "Damage Done", "Faction ID", "Security Status", "Ship Type ID", "Weapon Type ID",
+                       "Final Blow");
 
-      CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
-      CachedData.stream(at, (long contid, AttributeSelector ats) ->
-                            KillAttacker.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
-                                                     AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
-                                                     AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
-                                                     AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()),
-                        true, capture)
-                .forEach(next -> {
-                  try {
-                    // @formatter:off
+    CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
+    CachedData.stream(at, (long contid, AttributeSelector ats) ->
+                          KillAttacker.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
+                                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()),
+                      true, capture)
+              .forEach(next -> {
+                try {
+                  // @formatter:off
                   SheetUtils.populateNextRow(output,
                                              new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE),
                                              new DumpCell(next.getKillID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
@@ -60,14 +60,14 @@ public class KillSheetWriter {
                                              new DumpCell(next.getWeaponTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                              new DumpCell(next.isFinalBlow(), SheetUtils.CellFormat.NO_STYLE));
                   // @formatter:on
-                  } catch (IOException e) {
-                    capture.handle(e);
-                  }
-                  metaIDs.add(next.getCid());
-                });
+                } catch (IOException e) {
+                  capture.handle(e);
+                }
+                metaIDs.add(next.getCid());
+              });
 
-      output.flush();
-    }
+    output.flush();
+    stream.closeEntry();
 
     return metaIDs;
   }
@@ -79,20 +79,20 @@ public class KillSheetWriter {
     List<Long> metaIDs = new ArrayList<>();
     stream.putNextEntry(new ZipEntry("KillItems.csv"));
 
-    try (CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream))) {
-      output.printRecord("ID", "Kill ID", "Type ID", "Flag", "Quantity Destroyed", "Quantity Dropped", "Singleton",
-                         "Container", "Sequence");
+    CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
+    output.printRecord("ID", "Kill ID", "Type ID", "Flag", "Quantity Destroyed", "Quantity Dropped", "Singleton",
+                       "Container", "Sequence");
 
-      CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
-      CachedData.stream(at, (long contid, AttributeSelector ats) ->
-                            KillItem.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
-                                                 AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
-                                                 AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
-                                                 AttributeSelector.any()),
-                        true, capture)
-                .forEach(next -> {
-                  try {
-                    // @formatter:off
+    CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
+    CachedData.stream(at, (long contid, AttributeSelector ats) ->
+                          KillItem.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
+                                               AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                               AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                               AttributeSelector.any()),
+                      true, capture)
+              .forEach(next -> {
+                try {
+                  // @formatter:off
                   SheetUtils.populateNextRow(output,
                                              new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE),
                                              new DumpCell(next.getKillID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
@@ -104,14 +104,14 @@ public class KillSheetWriter {
                                              new DumpCell(next.getContainerSequence(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                              new DumpCell(next.getSequence(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
                   // @formatter:on
-                  } catch (IOException e) {
-                    capture.handle(e);
-                  }
-                  metaIDs.add(next.getCid());
-                });
+                } catch (IOException e) {
+                  capture.handle(e);
+                }
+                metaIDs.add(next.getCid());
+              });
 
-      output.flush();
-    }
+    output.flush();
+    stream.closeEntry();
 
     return metaIDs;
   }
@@ -123,20 +123,20 @@ public class KillSheetWriter {
     stream.putNextEntry(new ZipEntry("KillVictims.csv"));
     List<Long> metaIDs = new ArrayList<>();
 
-    try (CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream))) {
-      output.printRecord("ID", "Kill ID", "Alliance ID", "Kill Character ID", "Kill Corporation ID",
-                         "Damage Taken", "Faction ID", "Faction Name", "Ship Type ID", "X", "Y", "Z");
+    CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
+    output.printRecord("ID", "Kill ID", "Alliance ID", "Kill Character ID", "Kill Corporation ID",
+                       "Damage Taken", "Faction ID", "Faction Name", "Ship Type ID", "X", "Y", "Z");
 
-      CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
-      CachedData.stream(at, (long contid, AttributeSelector ats) ->
-                            KillVictim.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
-                                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
-                                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
-                                                   AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()),
-                        true, capture)
-                .forEach(next -> {
-                  try {
-                    // @formatter:off
+    CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
+    CachedData.stream(at, (long contid, AttributeSelector ats) ->
+                          KillVictim.accessQuery(acct, contid, 1000, false, ats, AttributeSelector.any(),
+                                                 AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                 AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                 AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()),
+                      true, capture)
+              .forEach(next -> {
+                try {
+                  // @formatter:off
                   SheetUtils.populateNextRow(output,
                                              new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE),
                                              new DumpCell(next.getKillID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
@@ -147,14 +147,14 @@ public class KillSheetWriter {
                                              new DumpCell(next.getFactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                              new DumpCell(next.getShipTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
                   // @formatter:on
-                  } catch (IOException e) {
-                    capture.handle(e);
-                  }
-                  metaIDs.add(next.getCid());
-                });
+                } catch (IOException e) {
+                  capture.handle(e);
+                }
+                metaIDs.add(next.getCid());
+              });
 
-      output.flush();
-    }
+    output.flush();
+    stream.closeEntry();
 
     return metaIDs;
   }
@@ -175,7 +175,8 @@ public class KillSheetWriter {
     stream.putNextEntry(new ZipEntry("Kills.csv"));
     final List<Long> metaIDs = new ArrayList<>();
 
-    try (CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream))) {
+    {
+      CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
       output.printRecord("ID", "Kill ID", "Kill Time (Raw)", "Kill Time", "Moon ID", "Solar System ID");
 
       CachedData.SimpleStreamExceptionHandler capture = new CachedData.SimpleStreamExceptionHandler();
@@ -202,33 +203,35 @@ public class KillSheetWriter {
                 });
 
       output.flush();
+      stream.closeEntry();
     }
 
     if (!metaIDs.isEmpty()) {
       // Wrote at least one kill so proceed
 
       // Write out meta data for kills
-      try (CSVPrinter output = SheetUtils.prepForMetaData("KillsMeta.csv", stream, false, null)) {
+      {
+        CSVPrinter output = SheetUtils.prepForMetaData("KillsMeta.csv", stream, false, null);
         for (Long next : metaIDs) {
           int count = SheetUtils.dumpNextMetaData(acct, output, next, "Kill");
           if (count > 0) output.println();
         }
         output.flush();
+        stream.closeEntry();
       }
-      stream.closeEntry();
 
       // Write out kill attackers data in the same style as meta data.
       metaIDs.clear();
       metaIDs.addAll(dumpKillAttackers(acct, stream, at));
       if (!metaIDs.isEmpty()) {
         // Only write out meta-data if an attacker was actually written.
-        try (CSVPrinter output = SheetUtils.prepForMetaData("KillAttackersMeta.csv", stream, false, null)) {
-          for (Long next : metaIDs) {
-            int count = SheetUtils.dumpNextMetaData(acct, output, next, "KillAttacker");
-            if (count > 0) output.println();
-          }
-          output.flush();
+        CSVPrinter output = SheetUtils.prepForMetaData("KillAttackersMeta.csv", stream, false, null);
+        for (Long next : metaIDs) {
+          int count = SheetUtils.dumpNextMetaData(acct, output, next, "KillAttacker");
+          if (count > 0) output.println();
         }
+        output.flush();
+        stream.closeEntry();
       }
 
       // Write out kill items data in the same style as meta data.
@@ -236,13 +239,13 @@ public class KillSheetWriter {
       metaIDs.addAll(dumpKillItems(acct, stream, at));
       if (!metaIDs.isEmpty()) {
         // Only write out meta-data if an item was actually written.
-        try (CSVPrinter output = SheetUtils.prepForMetaData("KillItemsMeta.csv", stream, false, null)) {
-          for (Long next : metaIDs) {
-            int count = SheetUtils.dumpNextMetaData(acct, output, next, "KillItem");
-            if (count > 0) output.println();
-          }
-          output.flush();
+        CSVPrinter output = SheetUtils.prepForMetaData("KillItemsMeta.csv", stream, false, null);
+        for (Long next : metaIDs) {
+          int count = SheetUtils.dumpNextMetaData(acct, output, next, "KillItem");
+          if (count > 0) output.println();
         }
+        output.flush();
+        stream.closeEntry();
       }
 
       // Write out kill victim data in the same style as meta data.
@@ -250,13 +253,13 @@ public class KillSheetWriter {
       metaIDs.addAll(dumpKillVictims(acct, stream, at));
       if (!metaIDs.isEmpty()) {
         // Only write out meta-data if a victim was actually written.
-        try (CSVPrinter output = SheetUtils.prepForMetaData("KillVictimsMeta.csv", stream, false, null)) {
-          for (Long next : metaIDs) {
-            int count = SheetUtils.dumpNextMetaData(acct, output, next, "KillVictim");
-            if (count > 0) output.println();
-          }
-          output.flush();
+        CSVPrinter output = SheetUtils.prepForMetaData("KillVictimsMeta.csv", stream, false, null);
+        for (Long next : metaIDs) {
+          int count = SheetUtils.dumpNextMetaData(acct, output, next, "KillVictim");
+          if (count > 0) output.println();
         }
+        output.flush();
+        stream.closeEntry();
       }
     }
   }
