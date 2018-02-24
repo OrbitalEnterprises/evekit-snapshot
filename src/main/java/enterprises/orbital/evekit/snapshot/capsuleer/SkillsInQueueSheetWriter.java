@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -15,6 +17,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.character.SkillInQueue;
 import enterprises.orbital.evekit.snapshot.SheetUtils;
 import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.w3c.dom.Attr;
 
 public class SkillsInQueueSheetWriter {
 
@@ -30,9 +33,14 @@ public class SkillsInQueueSheetWriter {
     // SkillsInQueueMeta.csv
     stream.putNextEntry(new ZipEntry("SkillsInQueue.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Type ID", "Queue Position", "Level", "Start SP", "Start Time (Raw)", "Start Time", "End SP", "End Time (Raw)", "End Time");
-    List<Long> metaIDs = new ArrayList<Long>();
-    List<SkillInQueue> skill = SkillInQueue.getAtOrAfterPosition(acct, at, 0);
+    output.printRecord("ID", "Type ID", "Queue Position", "Level", "Start SP", "Start Time (Raw)", "Start Time", "End SP", "End Time (Raw)", "End Time", "Training Start SP");
+    List<Long> metaIDs = new ArrayList<>();
+    List<SkillInQueue> skill = CachedData.retrieveAll(at, (contid, at1) -> SkillInQueue.accessQuery(acct, contid, 1000, false,
+                                                                                                    at1,
+                                                                                                    AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                                                                    AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                                                                    AttributeSelector.any(), AttributeSelector.any()));
+
     for (SkillInQueue next : skill) {
       // @formatter:off
       SheetUtils.populateNextRow(output, 
@@ -46,7 +54,7 @@ public class SkillsInQueueSheetWriter {
                                  new DumpCell(next.getEndSP(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(next.getEndTime(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(new Date(next.getEndTime()), SheetUtils.CellFormat.DATE_STYLE), 
-                                 new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE)); 
+                                 new DumpCell(next.getTrainingStartSP(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
       // @formatter:on
       metaIDs.add(next.getCid());
     }

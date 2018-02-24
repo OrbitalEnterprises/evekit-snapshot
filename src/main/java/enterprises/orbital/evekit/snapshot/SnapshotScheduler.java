@@ -36,7 +36,8 @@ public class SnapshotScheduler {
     return makeSnapshotFileNamePrefix(acct) + formatter.format(when) + ".zip";
   }
 
-  private static List<File> findSnapshotFiles(
+  @SuppressWarnings("WeakerAccess")
+  public static List<File> findSnapshotFiles(
       SynchronizedEveAccount acct)
     throws IOException {
     // Retrieve all snapshots for this account
@@ -136,6 +137,10 @@ public class SnapshotScheduler {
       // Capsuleers:
       CalendarSheetWriter.dumpToSheet(toDump, writer, at);
       CharacterSheetSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterSheetAttributesSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterSheetCloneSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterSheetJumpSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterSheetSkillPointsSheetWriter.dumpToSheet(toDump, writer, at);
       ImplantSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneImplantSheetWriter.dumpToSheet(toDump, writer, at);
@@ -148,7 +153,6 @@ public class SnapshotScheduler {
       PlanetaryColoniesSheetWriter.dumpToSheet(toDump, writer, at);
       ResearchAgentSheetWriter.dumpToSheet(toDump, writer, at);
       CapsuleerRoleSheetWriter.dumpToSheet(toDump, writer, at);
-      SkillInTrainingSheetWriter.dumpToSheet(toDump, writer, at);
       SkillSheetWriter.dumpToSheet(toDump, writer, at);
       SkillsInQueueSheetWriter.dumpToSheet(toDump, writer, at);
       TitleSheetWriter.dumpToSheet(toDump, writer, at);
