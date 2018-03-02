@@ -1,5 +1,14 @@
 package enterprises.orbital.evekit.snapshot.capsuleer;
 
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import enterprises.orbital.evekit.model.character.MailingList;
+import enterprises.orbital.evekit.snapshot.SheetUtils;
+import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -7,31 +16,27 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.character.MailingList;
-import enterprises.orbital.evekit.snapshot.SheetUtils;
-import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
-
 public class MailingListSheetWriter {
 
   // Singleton
   private MailingListSheetWriter() {}
 
   public static void dumpToSheet(
-                                 SynchronizedEveAccount acct,
-                                 ZipOutputStream stream,
-                                 long at) throws IOException {
+      SynchronizedEveAccount acct,
+      ZipOutputStream stream,
+      long at) throws IOException {
     // Sections:
     // MailingLists.csv
     // MailingListsMeta.csv
     stream.putNextEntry(new ZipEntry("MailingLists.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "List ID", "Display Name");
-    List<Long> metaIDs = new ArrayList<Long>();
-    List<MailingList> lists = MailingList.getAllLists(acct, at);
+    List<Long> metaIDs = new ArrayList<>();
+    List<MailingList> lists = CachedData.retrieveAll(at,
+                                                     (contid, at1) -> MailingList.accessQuery(acct, contid, 1000, false,
+                                                                                              at1,
+                                                                                              AttributeSelector.any(),
+                                                                                              AttributeSelector.any()));
     for (MailingList next : lists) {
       // @formatter:off
       SheetUtils.populateNextRow(output, 

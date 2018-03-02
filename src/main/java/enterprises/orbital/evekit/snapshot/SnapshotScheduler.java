@@ -147,6 +147,7 @@ public class SnapshotScheduler {
       ChatChannelSheetWriter.dumpToSheet(toDump, writer, at);
       ContactNotificationSheetWriter.dumpToSheet(toDump, writer, at);
       MailingListSheetWriter.dumpToSheet(toDump, writer, at);
+      MailLabelSheetWriter.dumpToSheet(toDump, writer, at);
       MailMessageSheetWriter.dumpToSheet(toDump, writer, at);
       MedalSheetWriter.dumpToSheet(toDump, writer, at);
       NotificationSheetWriter.dumpToSheet(toDump, writer, at);
