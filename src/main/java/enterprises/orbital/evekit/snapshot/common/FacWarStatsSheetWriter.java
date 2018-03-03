@@ -28,7 +28,7 @@ public class FacWarStatsSheetWriter {
     // FacWarStatsMeta.csv
     stream.putNextEntry(new ZipEntry("FacWarStats.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Current Rank", "Enlisted (Raw)", "Enlisted", "Faction ID", "Faction Name", "Highest Rank", "Kills Last Week", "Kills Total",
+    output.printRecord("ID", "Current Rank", "Enlisted (Raw)", "Enlisted", "Faction ID", "Highest Rank", "Kills Last Week", "Kills Total",
                        "Kills Yesterday", "Pilots", "Victory Points Last Week", "Victory Points Total", "Victory Points Yesterday");
     FacWarStats stats = FacWarStats.get(acct, at);
     if (stats != null) {
@@ -39,7 +39,6 @@ public class FacWarStatsSheetWriter {
                                  new DumpCell(stats.getEnlisted(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(new Date(stats.getEnlisted()), SheetUtils.CellFormat.DATE_STYLE),
                                  new DumpCell(stats.getFactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                 new DumpCell(stats.getFactionName(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(stats.getHighestRank(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(stats.getKillsLastWeek(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(stats.getKillsTotal(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
