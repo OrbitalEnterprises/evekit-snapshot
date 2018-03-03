@@ -1,19 +1,19 @@
 package enterprises.orbital.evekit.snapshot.common;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
 import enterprises.orbital.evekit.model.common.Contact;
 import enterprises.orbital.evekit.snapshot.SheetUtils;
 import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ContactSheetWriter {
 
@@ -29,15 +29,11 @@ public class ContactSheetWriter {
     // ContactsMeta.csv
     stream.putNextEntry(new ZipEntry("Contacts.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "List", "Contact ID", "Contact Name", "Standing", "Contact Type ID", "In Watch List", "Label Mask");
-    List<Contact> contacts = new ArrayList<Contact>();
-    long contid = -1;
-    List<Contact> batch = Contact.getAllContacts(acct, at, 1000, contid);
-    while (batch.size() > 0) {
-      contacts.addAll(batch);
-      contid = contacts.get(contacts.size() - 1).getCid();
-      batch = Contact.getAllContacts(acct, at, 1000, contid);
-    }
+    output.printRecord("ID", "List", "Contact ID", "Standing", "Contact Type", "In Watch List", "Is Blocked", "Label ID");
+    List<Contact> contacts = CachedData.retrieveAll(at,
+                                                    (contid, at1) -> Contact.accessQuery(acct, contid, 1000, false, at1, AttributeSelector.any(),
+                                                                                         AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
+                                                                                         AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()));
 
     for (Contact next : contacts) {
       // @formatter:off
@@ -45,11 +41,11 @@ public class ContactSheetWriter {
                                  new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(next.getList(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(next.getContactID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getContactName(), SheetUtils.CellFormat.NO_STYLE), 
-                                 new DumpCell(next.getStanding(), SheetUtils.CellFormat.DOUBLE_STYLE), 
-                                 new DumpCell(next.getContactTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                 new DumpCell(next.getStanding(), SheetUtils.CellFormat.DOUBLE_STYLE),
+                                 new DumpCell(next.getContactType(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.isInWatchlist(), SheetUtils.CellFormat.NO_STYLE),
-                                 new DumpCell(next.getLabelMask(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
+                                 new DumpCell(next.isBlocked(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.getLabelID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
       // @formatter:on
     }
 
