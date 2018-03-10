@@ -171,7 +171,7 @@ public class PlanetaryColoniesSheetWriter {
                                    new DumpCell(next.getSourcePinID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getDestinationPinID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getContentTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getQuantity(), SheetUtils.CellFormat.DOUBLE_STYLE),
                                    new DumpCell(Arrays.toString(next.getWaypoints().toArray(new Long[next.getWaypoints().size()])), SheetUtils.CellFormat.NO_STYLE));
         // @formatter:on
         if (next.hasMetaData()) itemIDs.add(next.getCid());
