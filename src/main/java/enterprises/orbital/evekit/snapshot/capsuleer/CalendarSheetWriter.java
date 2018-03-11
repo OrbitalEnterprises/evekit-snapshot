@@ -1,5 +1,15 @@
 package enterprises.orbital.evekit.snapshot.capsuleer;
 
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import enterprises.orbital.evekit.model.character.CalendarEventAttendee;
+import enterprises.orbital.evekit.model.character.UpcomingCalendarEvent;
+import enterprises.orbital.evekit.snapshot.SheetUtils;
+import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -8,33 +18,30 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.character.CalendarEventAttendee;
-import enterprises.orbital.evekit.model.character.UpcomingCalendarEvent;
-import enterprises.orbital.evekit.snapshot.SheetUtils;
-import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
-
 public class CalendarSheetWriter {
 
   // Singleton
   private CalendarSheetWriter() {}
 
-  public static List<Long> dumpCalendarEventAttendees(
-                                                      SynchronizedEveAccount acct,
-                                                      ZipOutputStream stream,
-                                                      List<UpcomingCalendarEvent> events,
-                                                      long at)
-    throws IOException {
-    List<Long> itemIDs = new ArrayList<Long>();
+  private static List<Long> dumpCalendarEventAttendees(
+      SynchronizedEveAccount acct,
+      ZipOutputStream stream,
+      List<UpcomingCalendarEvent> events,
+      long at)
+      throws IOException {
+    List<Long> itemIDs = new ArrayList<>();
     stream.putNextEntry(new ZipEntry("CalendarEventAttendees.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Event ID", "Character ID", "Character Name", "Response");
+    output.printRecord("ID", "Event ID", "Character ID", "Response");
     for (UpcomingCalendarEvent event : events) {
-      long eventID = event.getEventID();
-      List<CalendarEventAttendee> allAttendees = CalendarEventAttendee.getByEventID(acct, at, eventID);
+      int eventID = event.getEventID();
+      List<CalendarEventAttendee> allAttendees = CachedData.retrieveAll(at,
+                                                                        (contid, at1) -> CalendarEventAttendee.accessQuery(
+                                                                            acct, contid, 1000, false,
+                                                                            at1,
+                                                                            AttributeSelector.values(eventID),
+                                                                            AttributeSelector.any(),
+                                                                            AttributeSelector.any()));
       if (allAttendees.size() > 0) {
         for (CalendarEventAttendee next : allAttendees) {
           // @formatter:off
@@ -42,7 +49,6 @@ public class CalendarSheetWriter {
                                      new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE),
                                      new DumpCell(next.getEventID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                      new DumpCell(next.getCharacterID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                     new DumpCell(next.getCharacterName(), SheetUtils.CellFormat.NO_STYLE),
                                      new DumpCell(next.getResponse(), SheetUtils.CellFormat.NO_STYLE));
           // @formatter:on
           itemIDs.add(next.getCid());
@@ -57,10 +63,10 @@ public class CalendarSheetWriter {
   }
 
   public static void dumpToSheet(
-                                 SynchronizedEveAccount acct,
-                                 ZipOutputStream stream,
-                                 long at)
-    throws IOException {
+      SynchronizedEveAccount acct,
+      ZipOutputStream stream,
+      long at)
+      throws IOException {
     // Sections:
     // UpcomingCalendarEvents.csv
     // UpcomingCalendarEventsMeta.csv
@@ -68,10 +74,26 @@ public class CalendarSheetWriter {
     // CalendarEventAttendeesMeta.csv
     stream.putNextEntry(new ZipEntry("UpcomingCalendarEvents.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Event ID", "Event Title", "Event Text", "Event Date (Raw)", "Event Date", "Duration", "Owner ID", "Owner Name", "Response",
-                       "Important", "Owner Type ID");
-    List<UpcomingCalendarEvent> events = UpcomingCalendarEvent.getAllUpcomingCalendarEvents(acct, at);
-    List<Long> metaIDs = new ArrayList<Long>();
+    output.printRecord("ID", "Event ID", "Event Title", "Event Text", "Event Date (Raw)", "Event Date", "Duration",
+                       "Owner ID", "Owner Name", "Response",
+                       "Importance", "Owner Type");
+    List<UpcomingCalendarEvent> events = CachedData.retrieveAll(at,
+                                                                (contid, at1) -> UpcomingCalendarEvent.accessQuery(acct,
+                                                                                                                   contid,
+                                                                                                                   1000,
+                                                                                                                   false,
+                                                                                                                   at1,
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any(),
+                                                                                                                   AttributeSelector.any()));
+    List<Long> metaIDs = new ArrayList<>();
 
     // Write out event data first
     for (UpcomingCalendarEvent next : events) {
@@ -87,8 +109,8 @@ public class CalendarSheetWriter {
                                  new DumpCell(next.getOwnerID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(next.getOwnerName(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.getResponse(), SheetUtils.CellFormat.NO_STYLE),
-                                 new DumpCell(next.isImportant(), SheetUtils.CellFormat.NO_STYLE),
-                                 new DumpCell(next.getOwnerTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
+                                 new DumpCell(next.getImportance(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                 new DumpCell(next.getOwnerType(), SheetUtils.CellFormat.NO_STYLE));
       // @formatter:on
       metaIDs.add(next.getCid());
     }
