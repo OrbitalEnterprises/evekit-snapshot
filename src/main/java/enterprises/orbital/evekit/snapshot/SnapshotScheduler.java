@@ -153,7 +153,7 @@ public class SnapshotScheduler {
       NotificationSheetWriter.dumpToSheet(toDump, writer, at);
       PlanetaryColoniesSheetWriter.dumpToSheet(toDump, writer, at);
       ResearchAgentSheetWriter.dumpToSheet(toDump, writer, at);
-      CapsuleerRoleSheetWriter.dumpToSheet(toDump, writer, at);
+      CharacterRoleSheetWriter.dumpToSheet(toDump, writer, at);
       SkillSheetWriter.dumpToSheet(toDump, writer, at);
       SkillsInQueueSheetWriter.dumpToSheet(toDump, writer, at);
       TitleSheetWriter.dumpToSheet(toDump, writer, at);
