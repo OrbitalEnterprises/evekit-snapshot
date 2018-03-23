@@ -1,5 +1,14 @@
 package enterprises.orbital.evekit.snapshot.corporation;
 
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import enterprises.orbital.evekit.model.corporation.CorporationMedal;
+import enterprises.orbital.evekit.snapshot.SheetUtils;
+import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -8,31 +17,31 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.corporation.CorporationMedal;
-import enterprises.orbital.evekit.snapshot.SheetUtils;
-import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
-
 public class CorporationMedalSheetWriter {
 
   // Singleton
   private CorporationMedalSheetWriter() {}
 
   public static void dumpToSheet(
-                                 SynchronizedEveAccount acct,
-                                 ZipOutputStream stream,
-                                 long at) throws IOException {
+      SynchronizedEveAccount acct,
+      ZipOutputStream stream,
+      long at) throws IOException {
     // Sections:
     // CorporationMedals.csv
     // CorporationMedalsMeta.csv
     stream.putNextEntry(new ZipEntry("CorporationMedals.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Medal ID", "Title", "Description", "Created (Raw)", "Created", "Creator ID");
-    List<Long> metaIDs = new ArrayList<Long>();
-    List<CorporationMedal> medals = CorporationMedal.getAll(acct, at);
+    List<Long> metaIDs = new ArrayList<>();
+    List<CorporationMedal> medals = CachedData.retrieveAll(at,
+                                                           (contid, at1) -> CorporationMedal.accessQuery(acct, contid,
+                                                                                                         1000, false,
+                                                                                                         at1,
+                                                                                                         AttributeSelector.any(),
+                                                                                                         AttributeSelector.any(),
+                                                                                                         AttributeSelector.any(),
+                                                                                                         AttributeSelector.any(),
+                                                                                                         AttributeSelector.any()));
     for (CorporationMedal next : medals) {
       // @formatter:off
       SheetUtils.populateNextRow(output, 

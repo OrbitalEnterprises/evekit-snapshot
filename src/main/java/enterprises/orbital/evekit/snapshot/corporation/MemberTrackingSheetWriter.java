@@ -1,5 +1,14 @@
 package enterprises.orbital.evekit.snapshot.corporation;
 
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import enterprises.orbital.evekit.model.corporation.MemberTracking;
+import enterprises.orbital.evekit.snapshot.SheetUtils;
+import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -8,65 +17,54 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.corporation.MemberTracking;
-import enterprises.orbital.evekit.snapshot.SheetUtils;
-import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
-
 public class MemberTrackingSheetWriter {
 
   // Singleton
   private MemberTrackingSheetWriter() {}
 
   public static void dumpToSheet(
-                                 SynchronizedEveAccount acct,
-                                 ZipOutputStream stream,
-                                 long at) throws IOException {
+      SynchronizedEveAccount acct,
+      ZipOutputStream stream,
+      long at) throws IOException {
     // Sections:
     // MemberTracking.csv
     // MemberTrackingMeta.csv
     stream.putNextEntry(new ZipEntry("MemberTracking.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Character ID", "Base", "Base ID", "Grantable Roles", "Location", "Location ID", "Logoff Date Time (Raw)", "Logoff Date Time",
-                       "Logon Date Time (Raw)", "Logon Date Time", "Name", "Roles", "Ship Type", "Ship Type ID", "Start Date Time (Raw)", "Start Date Time",
-                       "Title");
-    List<Long> metaIDs = new ArrayList<Long>();
-    long contid = -1;
-    List<MemberTracking> batch = MemberTracking.getAll(acct, at, 1000, contid);
+    output.printRecord("ID", "Character ID", "Base ID", "Location ID", "Logoff Date Time (Raw)", "Logoff Date Time",
+                       "Logon Date Time (Raw)", "Logon Date Time", "Ship Type ID", "Start Date Time (Raw)",
+                       "Start Date Time");
+    List<Long> metaIDs = new ArrayList<>();
+    List<MemberTracking> batch = CachedData.retrieveAll(at,
+                                                        (contid, at1) -> MemberTracking.accessQuery(acct, contid, 1000,
+                                                                                                    false,
+                                                                                                    at1,
+                                                                                                    AttributeSelector.any(),
+                                                                                                    AttributeSelector.any(),
+                                                                                                    AttributeSelector.any(),
+                                                                                                    AttributeSelector.any(),
+                                                                                                    AttributeSelector.any(),
+                                                                                                    AttributeSelector.any(),
+                                                                                                    AttributeSelector.any()));
 
-    while (batch.size() > 0) {
-
-      for (MemberTracking next : batch) {
-        // @formatter:off
+    for (MemberTracking next : batch) {
+      // @formatter:off
         SheetUtils.populateNextRow(output, 
                                    new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getCharacterID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                   new DumpCell(next.getBase(), SheetUtils.CellFormat.NO_STYLE), 
                                    new DumpCell(next.getBaseID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getGrantableRoles(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getLocation(), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(next.getLocationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getLogoffDateTime(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(new Date(next.getLogoffDateTime()), SheetUtils.CellFormat.DATE_STYLE),
                                    new DumpCell(next.getLogonDateTime(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(new Date(next.getLogonDateTime()), SheetUtils.CellFormat.DATE_STYLE),
-                                   new DumpCell(next.getName(), SheetUtils.CellFormat.NO_STYLE),
-                                   new DumpCell(next.getRoles(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(next.getShipType(), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(next.getShipTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getStartDateTime(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                   new DumpCell(new Date(next.getStartDateTime()), SheetUtils.CellFormat.DATE_STYLE),
-                                   new DumpCell(next.getTitle(), SheetUtils.CellFormat.NO_STYLE)); 
+                                   new DumpCell(new Date(next.getStartDateTime()), SheetUtils.CellFormat.DATE_STYLE));
         // @formatter:on
-        metaIDs.add(next.getCid());
-      }
-
-      contid = batch.get(batch.size() - 1).getCharacterID();
-      batch = MemberTracking.getAll(acct, at, 1000, contid);
+      metaIDs.add(next.getCid());
     }
+
     output.flush();
     stream.closeEntry();
 
