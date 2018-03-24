@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -29,17 +31,18 @@ public class CorporationDivisionSheetWriter {
     // DivisionsMeta.csv
     stream.putNextEntry(new ZipEntry("Divisions.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Account Key", "Description", "Wallet");
-    List<Long> metaIDs = new ArrayList<Long>();
-    List<Division> batch = Division.getAllByType(acct, at, true);
-    batch.addAll(Division.getAllByType(acct, at, false));
+    output.printRecord("ID", "Division", "Name", "Wallet");
+    List<Long> metaIDs = new ArrayList<>();
+    List<Division> batch = CachedData.retrieveAll(at,
+                                                  (contid, at1) -> Division.accessQuery(acct, contid, 1000, false, at1,
+                                                                                        AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()));
 
     for (Division next : batch) {
       // @formatter:off
       SheetUtils.populateNextRow(output, 
                                  new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
-                                 new DumpCell(next.getAccountKey(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getDescription(), SheetUtils.CellFormat.NO_STYLE), 
+                                 new DumpCell(next.getDivision(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                 new DumpCell(next.getName(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.isWallet(), SheetUtils.CellFormat.NO_STYLE)); 
       // @formatter:on
       metaIDs.add(next.getCid());

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -29,20 +31,20 @@ public class ShareholderSheetWriter {
     // ShareholdersMeta.csv
     stream.putNextEntry(new ZipEntry("Shareholders.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Shareholder ID", "Corporation", "Shareholder Corporation ID", "Shareholder Corporation Name", "Shareholder Name", "Shares");
-    List<Long> metaIDs = new ArrayList<Long>();
-    List<Shareholder> batch = Shareholder.getAll(acct, at);
+    output.printRecord("ID", "Shareholder ID", "Shareholder Type", "Shares");
+    List<Long> metaIDs = new ArrayList<>();
+    List<Shareholder> batch = CachedData.retrieveAll(at,
+                                                     (contid, at1) -> Shareholder.accessQuery(acct, contid, 1000, false,
+                                                                                              at1,
+                                                                                              AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any()));
 
     for (Shareholder next : batch) {
       // @formatter:off
       SheetUtils.populateNextRow(output, 
                                  new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(next.getShareholderID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.isCorporation(), SheetUtils.CellFormat.NO_STYLE), 
-                                 new DumpCell(next.getShareholderCorporationID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
-                                 new DumpCell(next.getShareholderCorporationName(), SheetUtils.CellFormat.NO_STYLE), 
-                                 new DumpCell(next.getShareholderName(), SheetUtils.CellFormat.NO_STYLE), 
-                                 new DumpCell(next.getShares(), SheetUtils.CellFormat.LONG_NUMBER_STYLE)); 
+                                 new DumpCell(next.getShareholderType(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.getShares(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
       // @formatter:on
       metaIDs.add(next.getCid());
     }
