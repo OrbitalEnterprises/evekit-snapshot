@@ -168,15 +168,15 @@ public class SnapshotScheduler {
       CorporationMemberMedalSheetWriter.dumpToSheet(toDump, writer, at);
       CorporationSheetSheetWriter.dumpToSheet(toDump, writer, at);
       CorporationTitleSheetWriter.dumpToSheet(toDump, writer, at);
+      CorporationTitleRoleSheetWriter.dumpToSheet(toDump, writer, at);
       CustomsOfficesSheetWriter.dumpToSheet(toDump, writer, at);
       FacilitiesSheetWriter.dumpToSheet(toDump, writer, at);
-      MemberSecuritySheetWriter.dumpToSheet(toDump, writer, at);
-      MemberSecurityLogSheetWriter.dumpToSheet(toDump, writer, at);
+      MemberSheetWriter.dumpToSheet(toDump, writer, at);
+      MemberRoleSheetWriter.dumpToSheet(toDump, writer, at);
+      MemberRoleHistorySheetWriter.dumpToSheet(toDump, writer, at);
+      MemberTitleSheetWriter.dumpToSheet(toDump, writer, at);
       MemberTrackingSheetWriter.dumpToSheet(toDump, writer, at);
       OutpostSheetWriter.dumpToSheet(toDump, writer, at);
-      CorporationRoleSheetWriter.dumpToSheet(toDump, writer, at);
-      SecurityRoleSheetWriter.dumpToSheet(toDump, writer, at);
-      SecurityTitleSheetWriter.dumpToSheet(toDump, writer, at);
       ShareholderSheetWriter.dumpToSheet(toDump, writer, at);
       StarbaseSheetWriter.dumpToSheet(toDump, writer, at);
     }
