@@ -20,13 +20,14 @@ import java.util.zip.ZipOutputStream;
  * Create a snapshot of the given account. A separate cron job queues these up every few hours and deletes older snapshots as necessary.
  */
 public class SnapshotScheduler {
-  protected static final Logger log               = Logger.getLogger(SnapshotScheduler.class.getName());
-  private static final String    PROP_SNAPSHOT_DIR = "enterprises.orbital.evekit.snapshot.directory";
-  private static final String    DEF_SNAPSHOT_DIR  = ".";
+  protected static final Logger log = Logger.getLogger(SnapshotScheduler.class.getName());
+  private static final String PROP_SNAPSHOT_DIR = "enterprises.orbital.evekit.snapshot.directory";
+  private static final String DEF_SNAPSHOT_DIR = ".";
 
   private static String makeSnapshotFileNamePrefix(
       SynchronizedEveAccount acct) {
-    return "snapshot_" + acct.getUserAccount().getUid() + "_" + acct.getAid() + "_";
+    return "snapshot_" + acct.getUserAccount()
+                             .getUid() + "_" + acct.getAid() + "_";
   }
 
   private static String makeSnapshotFileName(
@@ -38,26 +39,26 @@ public class SnapshotScheduler {
 
   @SuppressWarnings("WeakerAccess")
   public static List<File> findSnapshotFiles(
-      SynchronizedEveAccount acct)
-    throws IOException {
+      SynchronizedEveAccount acct) {
     // Retrieve all snapshots for this account
-    List<File> eligible = new ArrayList<>();
     final String prefix = makeSnapshotFileNamePrefix(acct);
     String snapshotDir = OrbitalProperties.getGlobalProperty(PROP_SNAPSHOT_DIR, DEF_SNAPSHOT_DIR);
     File dir = new File(snapshotDir);
-    eligible.addAll(Arrays.asList(dir.listFiles((dir1, name) -> name.startsWith(prefix))));
+    List<File> eligible = new ArrayList<>(Arrays.asList(dir.listFiles((dir1, name) -> name.startsWith(prefix))));
     // Sort ascending by date.
-    Collections.sort(eligible, new Comparator<File>() {
-      final String           formatString = "yyyy_MM_dd_HH_mm_ss";
-      final SimpleDateFormat formatter    = new SimpleDateFormat(formatString);
+    eligible.sort(new Comparator<File>() {
+      final String formatString = "yyyy_MM_dd_HH_mm_ss";
+      final SimpleDateFormat formatter = new SimpleDateFormat(formatString);
 
       @Override
       public int compare(
-                         File arg0,
-                         File arg1) {
+          File arg0,
+          File arg1) {
         try {
-          Date f1 = formatter.parse(arg0.getName().substring(prefix.length(), prefix.length() + formatString.length()));
-          Date f2 = formatter.parse(arg1.getName().substring(prefix.length(), prefix.length() + formatString.length()));
+          Date f1 = formatter.parse(arg0.getName()
+                                        .substring(prefix.length(), prefix.length() + formatString.length()));
+          Date f2 = formatter.parse(arg1.getName()
+                                        .substring(prefix.length(), prefix.length() + formatString.length()));
           return f1.compareTo(f2);
         } catch (ParseException e) {
           log.log(Level.WARNING, "Failed to compare snapshot file names: " + arg0 + " " + arg1, e);
@@ -69,24 +70,25 @@ public class SnapshotScheduler {
   }
 
   public static long lastSnapshotTime(
-                                      SynchronizedEveAccount acct)
-    throws IOException, ParseException {
+      SynchronizedEveAccount acct)
+      throws ParseException {
     List<File> snapshots = findSnapshotFiles(acct);
     if (snapshots.size() > 0) {
       String prefix = makeSnapshotFileNamePrefix(acct);
       String formatString = "yyyy_MM_dd_HH_mm_ss";
       SimpleDateFormat formatter = new SimpleDateFormat(formatString);
       File last = snapshots.get(snapshots.size() - 1);
-      Date when = formatter.parse(last.getName().substring(prefix.length(), prefix.length() + formatString.length()));
+      Date when = formatter.parse(last.getName()
+                                      .substring(prefix.length(), prefix.length() + formatString.length()));
       return when.getTime();
     }
     return 0;
   }
 
   public static void generateAccountSnapshot(
-                                             SynchronizedEveAccount acct,
-                                             long at)
-    throws IOException {
+      SynchronizedEveAccount acct,
+      long at)
+      throws IOException {
     // Generate output zip with one entry per sheet.
     log.info("Generating snapshot for: " + acct);
     Date now = new Date(at);
@@ -114,7 +116,7 @@ public class SnapshotScheduler {
       SynchronizedEveAccount toDump,
       ZipOutputStream writer,
       long at)
-    throws IOException {
+      throws IOException {
 
     // Write out common components
     AccountBalanceSheetWriter.dumpToSheet(toDump, writer, at);
@@ -176,7 +178,6 @@ public class SnapshotScheduler {
       MemberRoleHistorySheetWriter.dumpToSheet(toDump, writer, at);
       MemberTitleSheetWriter.dumpToSheet(toDump, writer, at);
       MemberTrackingSheetWriter.dumpToSheet(toDump, writer, at);
-      OutpostSheetWriter.dumpToSheet(toDump, writer, at);
       ShareholderSheetWriter.dumpToSheet(toDump, writer, at);
       StarbaseSheetWriter.dumpToSheet(toDump, writer, at);
     }
