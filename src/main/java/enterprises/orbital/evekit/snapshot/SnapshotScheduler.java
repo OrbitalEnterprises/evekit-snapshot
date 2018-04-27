@@ -44,7 +44,9 @@ public class SnapshotScheduler {
     final String prefix = makeSnapshotFileNamePrefix(acct);
     String snapshotDir = OrbitalProperties.getGlobalProperty(PROP_SNAPSHOT_DIR, DEF_SNAPSHOT_DIR);
     File dir = new File(snapshotDir);
-    List<File> eligible = new ArrayList<>(Arrays.asList(dir.listFiles((dir1, name) -> name.startsWith(prefix))));
+    File[] fileList = dir.listFiles((dir1, name) -> name.startsWith(prefix));
+    if (fileList == null) return Collections.emptyList();
+    List<File> eligible = Arrays.asList(fileList);
     // Sort ascending by date.
     eligible.sort(new Comparator<File>() {
       final String formatString = "yyyy_MM_dd_HH_mm_ss";
@@ -143,6 +145,7 @@ public class SnapshotScheduler {
       CharacterSheetCloneSheetWriter.dumpToSheet(toDump, writer, at);
       CharacterSheetJumpSheetWriter.dumpToSheet(toDump, writer, at);
       CharacterSheetSkillPointsSheetWriter.dumpToSheet(toDump, writer, at);
+      FittingsSheetWriter.dumpToSheet(toDump, writer, at);
       ImplantSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneImplantSheetWriter.dumpToSheet(toDump, writer, at);
