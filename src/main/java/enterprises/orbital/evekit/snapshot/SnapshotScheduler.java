@@ -46,7 +46,9 @@ public class SnapshotScheduler {
     File dir = new File(snapshotDir);
     File[] fileList = dir.listFiles((dir1, name) -> name.startsWith(prefix));
     if (fileList == null) return Collections.emptyList();
-    List<File> eligible = Arrays.asList(fileList);
+    // This next copy is necessary because Arrays.asList returns an inner class which does
+    // not support the remove method.
+    List<File> eligible = new ArrayList<>(Arrays.asList(fileList));
     // Sort ascending by date.
     eligible.sort(new Comparator<File>() {
       final String formatString = "yyyy_MM_dd_HH_mm_ss";
@@ -71,6 +73,7 @@ public class SnapshotScheduler {
     return eligible;
   }
 
+  @SuppressWarnings("unused")
   public static long lastSnapshotTime(
       SynchronizedEveAccount acct)
       throws ParseException {
@@ -87,6 +90,7 @@ public class SnapshotScheduler {
     return 0;
   }
 
+  @SuppressWarnings("unused")
   public static void generateAccountSnapshot(
       SynchronizedEveAccount acct,
       long at)
