@@ -153,6 +153,7 @@ public class SnapshotScheduler {
       ImplantSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneImplantSheetWriter.dumpToSheet(toDump, writer, at);
+      LoyaltyPointsSheetWriter.dumpToSheet(toDump, writer, at);
       ChatChannelSheetWriter.dumpToSheet(toDump, writer, at);
       ContactNotificationSheetWriter.dumpToSheet(toDump, writer, at);
       MailingListSheetWriter.dumpToSheet(toDump, writer, at);
