@@ -150,6 +150,7 @@ public class SnapshotScheduler {
       CharacterSheetJumpSheetWriter.dumpToSheet(toDump, writer, at);
       CharacterSheetSkillPointsSheetWriter.dumpToSheet(toDump, writer, at);
       FittingsSheetWriter.dumpToSheet(toDump, writer, at);
+      FleetsSheetWriter.dumpToSheet(toDump, writer, at);
       ImplantSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneSheetWriter.dumpToSheet(toDump, writer, at);
       JumpCloneImplantSheetWriter.dumpToSheet(toDump, writer, at);
@@ -162,6 +163,7 @@ public class SnapshotScheduler {
       MiningLedgerSheetWriter.dumpToSheet(toDump, writer, at);
       MedalSheetWriter.dumpToSheet(toDump, writer, at);
       NotificationSheetWriter.dumpToSheet(toDump, writer, at);
+      OpportunitySheetWriter.dumpToSheet(toDump, writer, at);
       PlanetaryColoniesSheetWriter.dumpToSheet(toDump, writer, at);
       ResearchAgentSheetWriter.dumpToSheet(toDump, writer, at);
       CharacterRoleSheetWriter.dumpToSheet(toDump, writer, at);
@@ -192,6 +194,7 @@ public class SnapshotScheduler {
       MiningObservationSheetWriter.dumpToSheet(toDump, writer, at);
       ShareholderSheetWriter.dumpToSheet(toDump, writer, at);
       StarbaseSheetWriter.dumpToSheet(toDump, writer, at);
+      StructureSheetWriter.dumpToSheet(toDump, writer, at);
     }
 
   }
