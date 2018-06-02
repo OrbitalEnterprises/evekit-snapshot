@@ -29,7 +29,7 @@ public class AssetSheetWriter {
     // AssetsMeta.csv
     stream.putNextEntry(new ZipEntry("Assets.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Item ID", "Location ID", "Location Type", "Location Flag", "Type ID", "Quantity", "Singleton", "Blueprint Type");
+    output.printRecord("ID", "Item ID", "Location ID", "Location Type", "Location Flag", "Type ID", "Quantity", "Singleton", "Blueprint Type", "Blueprint Copy");
     List<Asset> assets = new ArrayList<>();
     long contid = -1;
     List<Asset> batch = Asset.getAllAssets(acct, at, 1000, contid);
@@ -50,7 +50,8 @@ public class AssetSheetWriter {
                                  new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                  new DumpCell(next.isSingleton(), SheetUtils.CellFormat.NO_STYLE),
-                                 new DumpCell(next.getBlueprintType(), SheetUtils.CellFormat.NO_STYLE));
+                                 new DumpCell(next.getBlueprintType(), SheetUtils.CellFormat.NO_STYLE),
+                                 new DumpCell(next.isBlueprintCopy(), SheetUtils.CellFormat.NO_STYLE));
       // @formatter:on
     }
     output.flush();
