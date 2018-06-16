@@ -54,7 +54,7 @@ public class MailMessageSheetWriter {
                                    new DumpCell(new Date(nextMsg.getSentDate()), SheetUtils.CellFormat.DATE_STYLE),
                                    new DumpCell(nextMsg.getTitle(), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(nextMsg.isMsgRead(), SheetUtils.CellFormat.NO_STYLE),
-                                   new DumpCell(Arrays.toString(nextMsg.getLabels().toArray(new Integer[nextMsg.getLabels().size()])), SheetUtils.CellFormat.NO_STYLE),
+                                   new DumpCell(Arrays.toString(nextMsg.getLabels().toArray(new Integer[0])), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(Arrays.toString(nextMsg.getRecipients()
                                                                        .stream()
                                                                        .map(x -> "[" + x.getRecipientType() + ", " + x.getRecipientID() + "]")

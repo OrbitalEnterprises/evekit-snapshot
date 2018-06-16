@@ -11,6 +11,7 @@ import org.apache.commons.csv.CSVPrinter;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -29,7 +30,7 @@ public class ContactSheetWriter {
     // ContactsMeta.csv
     stream.putNextEntry(new ZipEntry("Contacts.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "List", "Contact ID", "Standing", "Contact Type", "In Watch List", "Is Blocked", "Label ID");
+    output.printRecord("ID", "List", "Contact ID", "Standing", "Contact Type", "In Watch List", "Is Blocked", "Labels");
     List<Contact> contacts = CachedData.retrieveAll(at,
                                                     (contid, at1) -> Contact.accessQuery(acct, contid, 1000, false, at1, AttributeSelector.any(),
                                                                                          AttributeSelector.any(), AttributeSelector.any(), AttributeSelector.any(),
@@ -45,7 +46,7 @@ public class ContactSheetWriter {
                                  new DumpCell(next.getContactType(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.isInWatchlist(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.isBlocked(), SheetUtils.CellFormat.NO_STYLE),
-                                 new DumpCell(next.getLabelID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
+                                 new DumpCell(Arrays.toString(next.getLabels().toArray(new Long[0])), SheetUtils.CellFormat.NO_STYLE));
       // @formatter:on
     }
 
