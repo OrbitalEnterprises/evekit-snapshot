@@ -1,5 +1,12 @@
 package enterprises.orbital.evekit.snapshot.common;
 
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.common.MarketOrder;
+import enterprises.orbital.evekit.snapshot.SheetUtils;
+import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -7,14 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.common.MarketOrder;
-import enterprises.orbital.evekit.snapshot.SheetUtils;
-import enterprises.orbital.evekit.snapshot.SheetUtils.DumpCell;
 
 public class MarketOrderSheetWriter {
 
@@ -30,9 +29,10 @@ public class MarketOrderSheetWriter {
     // MarketOrdersMeta.csv
     stream.putNextEntry(new ZipEntry("MarketOrders.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
-    output.printRecord("ID", "Order ID", "Wallet Division", "Bid", "Character ID", "Duration", "Escrow", "Issued (Raw)", "Issued", "Min Volume", "Order State",
-                       "Price", "Order Range", "Type ID", "Volume Entered", "Volume Remaining", "Region ID", "Location ID", "Is Corp");
-    List<Long> metaIDs = new ArrayList<Long>();
+    output.printRecord("ID", "Order ID", "Wallet Division", "Bid", "Character ID", "Duration", "Escrow",
+                       "Issued (Raw)", "Issued", "Issued By", "Min Volume", "Order State", "Price", "Order Range",
+                       "Type ID", "Volume Entered", "Volume Remaining", "Region ID", "Location ID", "Is Corp");
+    List<Long> metaIDs = new ArrayList<>();
     long contid = -1;
     List<MarketOrder> batch = MarketOrder.getAllForward(acct, at, 1000, contid);
 
@@ -50,7 +50,8 @@ public class MarketOrderSheetWriter {
                                    new DumpCell(next.getEscrow(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE), 
                                    new DumpCell(next.getIssued(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
                                    new DumpCell(new Date(next.getIssued()), SheetUtils.CellFormat.DATE_STYLE), 
-                                   new DumpCell(next.getMinVolume(), SheetUtils.CellFormat.LONG_NUMBER_STYLE), 
+                                   new DumpCell(next.getIssuedBy(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                   new DumpCell(next.getMinVolume(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                    new DumpCell(next.getOrderState(), SheetUtils.CellFormat.NO_STYLE),
                                    new DumpCell(next.getPrice(), SheetUtils.CellFormat.BIG_DECIMAL_STYLE), 
                                    new DumpCell(next.getOrderRange(), SheetUtils.CellFormat.NO_STYLE),
