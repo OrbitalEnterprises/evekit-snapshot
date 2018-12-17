@@ -32,7 +32,7 @@ public class CorporationSheetSheetWriter {
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Alliance ID", "Ceo ID", "Corporation ID", "Corporation Name", "Description",
                        "Member Count", "Shares", "Station ID", "Tax Rate", "Ticker", "Url",
-                       "Date Founded (Raw)", "Date Founded", "Creator ID", "Faction ID",
+                       "Date Founded (Raw)", "Date Founded", "Creator ID", "Faction ID", "War Eligible",
                        "px64x64", "px128x128", "px256x256");
     CorporationSheet csheet = CorporationSheet.get(acct, at);
     if (csheet != null) {
@@ -54,6 +54,7 @@ public class CorporationSheetSheetWriter {
                                  new DumpCell(new Date(csheet.getDateFounded()), SheetUtils.CellFormat.DATE_STYLE),
                                  new DumpCell(csheet.getCreatorID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(csheet.getFactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                 new DumpCell(csheet.isWarEligible(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(csheet.getPx64x64(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(csheet.getPx128x128(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(csheet.getPx256x256(), SheetUtils.CellFormat.NO_STYLE));
