@@ -84,7 +84,7 @@ public class FittingsSheetWriter {
                                  new DumpCell(next.getCid(), SheetUtils.CellFormat.NO_STYLE), 
                                  new DumpCell(next.getFittingID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(next.getTypeID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
-                                 new DumpCell(next.getFlag(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
+                                 new DumpCell(next.getFlag(), SheetUtils.CellFormat.NO_STYLE),
                                  new DumpCell(next.getQuantity(), SheetUtils.CellFormat.LONG_NUMBER_STYLE));
       // @formatter:on
     }
