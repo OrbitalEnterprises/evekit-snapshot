@@ -29,7 +29,7 @@ public class CharacterSheetSheetWriter {
     stream.putNextEntry(new ZipEntry("CharacterSheet.csv"));
     CSVPrinter output = CSVFormat.EXCEL.print(new OutputStreamWriter(stream));
     output.printRecord("ID", "Character ID", "Character Name", "Corporation ID", "RaceID", "DoB (Raw)", "DoB", "BloodlineID",
-                       "AncestryID", "Gender", "Alliance ID", "Faction ID", "Description", "Security Status");
+                       "AncestryID", "Gender", "Alliance ID", "Faction ID", "Description", "Security Status", "Title");
     CharacterSheet csheet = CharacterSheet.get(acct, at);
     if (csheet != null) {
       // @formatter:off
@@ -47,7 +47,8 @@ public class CharacterSheetSheetWriter {
                                  new DumpCell(csheet.getAllianceID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(csheet.getFactionID(), SheetUtils.CellFormat.LONG_NUMBER_STYLE),
                                  new DumpCell(csheet.getDescription(), SheetUtils.CellFormat.NO_STYLE),
-                                 new DumpCell(csheet.getSecurityStatus(), SheetUtils.CellFormat.DOUBLE_STYLE));
+                                 new DumpCell(csheet.getSecurityStatus(), SheetUtils.CellFormat.DOUBLE_STYLE),
+                                 new DumpCell(csheet.getTitle(), SheetUtils.CellFormat.NO_STYLE));
       // @formatter:on
       output.flush();
       stream.closeEntry();
